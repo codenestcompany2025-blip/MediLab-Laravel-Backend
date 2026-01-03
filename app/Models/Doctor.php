@@ -10,12 +10,24 @@ class Doctor extends Model
     use HasFactory;
 
     protected $fillable = [
-        'name', 'email', 'password', 'specialty',
-        'department_id', 'facebook', 'twitter',
-        'instagram', 'linkedin', 'image'
+        'name',
+        'email',
+        'password',
+        'specialty',
+        'department_id',
+        'facebook',
+        'twitter',
+        'instagram',
+        'linkedin',
+        'image',
+        'bio', 
     ];
 
     protected $hidden = ['password'];
+
+    protected $casts = [
+        'password' => 'hashed',
+    ];
 
     public function department()
     {
