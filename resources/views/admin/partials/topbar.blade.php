@@ -103,7 +103,7 @@
 
                     <div class="dropdown-divider"></div>
 
-                    <!-- ✅ Logout (POST) -->
+                    <!-- Logout (POST) -->
                     <form method="POST" action="{{ route('admin.logout') }}">
                         @csrf
                         <button type="submit" class="dropdown-item">

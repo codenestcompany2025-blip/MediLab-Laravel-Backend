@@ -24,9 +24,9 @@
                     <label>Icon class</label>
                     <input type="text" name="icon" value="{{ old('icon') }}"
                            class="form-control @error('icon') is-invalid @enderror"
-                           placeholder="مثال: fas fa-heartbeat">
+                           placeholder="example: fas fa-heartbeat">
                     @error('icon') <div class="invalid-feedback">{{ $message }}</div> @enderror
-                    <small class="text-muted">اكتبي كلاس الأيقونة (FontAwesome) مثل: <code>fas fa-heartbeat</code></small>
+                    <small class="text-muted">Write the icon class(FontAwesome) example: <code>fas fa-heartbeat</code></small>
                 </div>
 
                 <div class="form-group">

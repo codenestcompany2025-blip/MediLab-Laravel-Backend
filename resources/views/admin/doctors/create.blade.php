@@ -1,85 +1,86 @@
 @extends('admin.layouts.app')
 
 @section('title', 'Add Doctor')
-@section('page_title', 'Add Doctor')
-
-@section('page_actions')
-    <a href="{{ route('admin.doctors.index') }}" class="btn btn-sm btn-secondary">Back</a>
-@endsection
 
 @section('content')
+<h1 class="h3 mb-3 text-gray-800">Add Doctor</h1>
+
+@if ($errors->any())
+    <div class="alert alert-danger">
+        <ul class="mb-0">
+            @foreach ($errors->all() as $e) <li>{{ $e }}</li> @endforeach
+        </ul>
+    </div>
+@endif
 
 <div class="card shadow mb-4">
-    <div class="card-header py-3">
-        <h6 class="m-0 font-weight-bold text-primary">Create Doctor</h6>
-    </div>
-
     <div class="card-body">
         <form action="{{ route('admin.doctors.store') }}" method="POST" enctype="multipart/form-data">
             @csrf
 
-            <div class="form-group">
-                <label>Name</label>
-                <input class="form-control @error('name') is-invalid @enderror" name="name" value="{{ old('name') }}">
-                @error('name') <div class="invalid-feedback">{{ $message }}</div> @enderror
+            <div class="form-row">
+                <div class="form-group col-md-6">
+                    <label>Name *</label>
+                    <input type="text" name="name" class="form-control" value="{{ old('name') }}" required>
+                </div>
+                <div class="form-group col-md-6">
+                    <label>Specialty *</label>
+                    <input type="text" name="specialty" class="form-control" value="{{ old('specialty') }}" required>
+                </div>
             </div>
 
             <div class="form-group">
-                <label>Specialty</label>
-                <input class="form-control @error('specialty') is-invalid @enderror" name="specialty" value="{{ old('specialty') }}">
-                @error('specialty') <div class="invalid-feedback">{{ $message }}</div> @enderror
-            </div>
-
-            <div class="form-group">
-                <label>Department</label>
-                <select class="form-control @error('department_id') is-invalid @enderror" name="department_id">
-                    <option value="">-- Select Department --</option>
-                    @foreach($departments as $department)
-                        <option value="{{ $department->id }}" {{ old('department_id') == $department->id ? 'selected' : '' }}>
-                            {{ $department->name }}
-                        </option>
+                <label>Department *</label>
+                <select name="department_id" class="form-control" required>
+                    <option value="">-- Select --</option>
+                    @foreach($departments as $dep)
+                        <option value="{{ $dep->id }}" @selected(old('department_id') == $dep->id)>{{ $dep->name }}</option>
                     @endforeach
                 </select>
-                @error('department_id') <div class="invalid-feedback">{{ $message }}</div> @enderror
             </div>
 
             <div class="form-group">
-                <label>Bio (optional)</label>
-                <textarea class="form-control @error('bio') is-invalid @enderror" name="bio" rows="4">{{ old('bio') }}</textarea>
-                @error('bio') <div class="invalid-feedback">{{ $message }}</div> @enderror
+                <label>Email (optional)</label>
+                <input type="email" name="email" class="form-control" value="{{ old('email') }}">
+            </div>
+
+            <div class="form-group">
+                <label>Password (optional)</label>
+                <input type="password" name="password" class="form-control" value="{{ old('password') }}">
+            </div>
+
+            <div class="form-group">
+                <label>Bio</label>
+                <textarea name="bio" class="form-control" rows="5">{{ old('bio') }}</textarea>
             </div>
 
             <div class="form-row">
-                <div class="form-group col-md-6">
+                <div class="form-group col-md-3">
                     <label>Facebook</label>
-                    <input class="form-control" name="facebook" value="{{ old('facebook') }}">
+                    <input type="text" name="facebook" class="form-control" value="{{ old('facebook') }}">
                 </div>
-                <div class="form-group col-md-6">
+                <div class="form-group col-md-3">
                     <label>Twitter</label>
-                    <input class="form-control" name="twitter" value="{{ old('twitter') }}">
+                    <input type="text" name="twitter" class="form-control" value="{{ old('twitter') }}">
                 </div>
-            </div>
-
-            <div class="form-row">
-                <div class="form-group col-md-6">
+                <div class="form-group col-md-3">
                     <label>Instagram</label>
-                    <input class="form-control" name="instagram" value="{{ old('instagram') }}">
+                    <input type="text" name="instagram" class="form-control" value="{{ old('instagram') }}">
                 </div>
-                <div class="form-group col-md-6">
+                <div class="form-group col-md-3">
                     <label>LinkedIn</label>
-                    <input class="form-control" name="linkedin" value="{{ old('linkedin') }}">
+                    <input type="text" name="linkedin" class="form-control" value="{{ old('linkedin') }}">
                 </div>
             </div>
 
             <div class="form-group">
-                <label>Image (optional)</label>
-                <input type="file" class="form-control-file @error('image') is-invalid @enderror" name="image">
-                @error('image') <div class="text-danger small mt-1">{{ $message }}</div> @enderror
+                <label>Image</label>
+                <input type="file" name="image" class="form-control-file" accept="image/*">
             </div>
 
             <button class="btn btn-primary">Save</button>
+            <a href="{{ route('admin.doctors.index') }}" class="btn btn-secondary">Cancel</a>
         </form>
     </div>
 </div>
-
 @endsection

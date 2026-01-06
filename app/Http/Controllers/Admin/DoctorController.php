@@ -25,48 +25,56 @@ class DoctorController extends Controller
     public function store(Request $request)
     {
         $data = $request->validate([
-            'name' => ['required','string','max:255'],
-            'specialty' => ['required','string','max:255'],
-            'department_id' => ['required','exists:departments,id'],
-            'bio' => ['nullable','string'],
+            'name'          => ['required', 'string', 'max:255'],
+            'specialty'     => ['required', 'string', 'max:255'],
+            'department_id' => ['required', 'exists:departments,id'],
 
-            'facebook' => ['nullable','string','max:255'],
-            'twitter' => ['nullable','string','max:255'],
-            'instagram' => ['nullable','string','max:255'],
-            'linkedin' => ['nullable','string','max:255'],
+            'bio'           => ['nullable', 'string'],
+            'email'         => ['nullable', 'email', 'max:255', 'unique:doctors,email'],
+            'password'      => ['nullable', 'string', 'min:6'],
 
-            'image' => ['nullable','image','mimes:jpg,jpeg,png,webp','max:2048'],
+            'facebook'      => ['nullable', 'string', 'max:255'],
+            'twitter'       => ['nullable', 'string', 'max:255'],
+            'instagram'     => ['nullable', 'string', 'max:255'],
+            'linkedin'      => ['nullable', 'string', 'max:255'],
+
+            'image'         => ['nullable', 'image', 'mimes:jpg,jpeg,png,webp', 'max:2048'],
         ]);
 
         if ($request->hasFile('image')) {
             $data['image'] = $request->file('image')->store('doctors', 'public');
         }
 
+        if (empty($data['password'])) unset($data['password']);
+
         Doctor::create($data);
 
-        return redirect()->route('admin.doctors.index')->with('success','Doctor created successfully.');
+        return redirect()->route('admin.doctors.index')->with('success', 'Doctor created.');
     }
 
     public function edit(Doctor $doctor)
     {
         $departments = Department::orderBy('name')->get();
-        return view('admin.doctors.edit', compact('doctor','departments'));
+        return view('admin.doctors.edit', compact('doctor', 'departments'));
     }
 
     public function update(Request $request, Doctor $doctor)
     {
         $data = $request->validate([
-            'name' => ['required','string','max:255'],
-            'specialty' => ['required','string','max:255'],
-            'department_id' => ['required','exists:departments,id'],
-            'bio' => ['nullable','string'],
+            'name'          => ['required', 'string', 'max:255'],
+            'specialty'     => ['required', 'string', 'max:255'],
+            'department_id' => ['required', 'exists:departments,id'],
 
-            'facebook' => ['nullable','string','max:255'],
-            'twitter' => ['nullable','string','max:255'],
-            'instagram' => ['nullable','string','max:255'],
-            'linkedin' => ['nullable','string','max:255'],
+            'bio'           => ['nullable', 'string'],
+            'email'         => ['nullable', 'email', 'max:255', 'unique:doctors,email,' . $doctor->id],
+            'password'      => ['nullable', 'string', 'min:6'],
 
-            'image' => ['nullable','image','mimes:jpg,jpeg,png,webp','max:2048'],
+            'facebook'      => ['nullable', 'string', 'max:255'],
+            'twitter'       => ['nullable', 'string', 'max:255'],
+            'instagram'     => ['nullable', 'string', 'max:255'],
+            'linkedin'      => ['nullable', 'string', 'max:255'],
+
+            'image'         => ['nullable', 'image', 'mimes:jpg,jpeg,png,webp', 'max:2048'],
         ]);
 
         if ($request->hasFile('image')) {
@@ -76,9 +84,12 @@ class DoctorController extends Controller
             $data['image'] = $request->file('image')->store('doctors', 'public');
         }
 
+        if (empty($data['password'])) unset($data['password']);
+        if (!array_key_exists('email', $data) || empty($data['email'])) unset($data['email']);
+
         $doctor->update($data);
 
-        return redirect()->route('admin.doctors.index')->with('success','Doctor updated successfully.');
+        return redirect()->route('admin.doctors.index')->with('success', 'Doctor updated.');
     }
 
     public function destroy(Doctor $doctor)
@@ -86,9 +97,8 @@ class DoctorController extends Controller
         if ($doctor->image && Storage::disk('public')->exists($doctor->image)) {
             Storage::disk('public')->delete($doctor->image);
         }
-
         $doctor->delete();
 
-        return redirect()->route('admin.doctors.index')->with('success','Doctor deleted successfully.');
+        return redirect()->route('admin.doctors.index')->with('success', 'Doctor deleted.');
     }
 }

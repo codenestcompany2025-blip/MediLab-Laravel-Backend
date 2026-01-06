@@ -23,15 +23,18 @@ class GalleryController extends Controller
     public function store(Request $request)
     {
         $data = $request->validate([
-            'caption' => ['nullable','string','max:255'],
-            'path' => ['required','image','mimes:jpg,jpeg,png,webp','max:4096'],
+            'caption' => ['nullable', 'string', 'max:255'],
+            'image'   => ['required', 'image', 'mimes:jpg,jpeg,png,webp', 'max:4096'],
         ]);
 
-        $data['path'] = $request->file('path')->store('gallery', 'public');
+        $path = $request->file('image')->store('galleries', 'public');
 
-        Gallery::create($data);
+        Gallery::create([
+            'caption' => $data['caption'] ?? null,
+            'path' => $path,
+        ]);
 
-        return redirect()->route('admin.galleries.index')->with('success','Image uploaded successfully.');
+        return redirect()->route('admin.galleries.index')->with('success', 'Gallery image added.');
     }
 
     public function edit(Gallery $gallery)
@@ -42,20 +45,24 @@ class GalleryController extends Controller
     public function update(Request $request, Gallery $gallery)
     {
         $data = $request->validate([
-            'caption' => ['nullable','string','max:255'],
-            'path' => ['nullable','image','mimes:jpg,jpeg,png,webp','max:4096'],
+            'caption' => ['nullable', 'string', 'max:255'],
+            'image'   => ['nullable', 'image', 'mimes:jpg,jpeg,png,webp', 'max:4096'],
         ]);
 
-        if ($request->hasFile('path')) {
+        $update = [
+            'caption' => $data['caption'] ?? null,
+        ];
+
+        if ($request->hasFile('image')) {
             if ($gallery->path && Storage::disk('public')->exists($gallery->path)) {
                 Storage::disk('public')->delete($gallery->path);
             }
-            $data['path'] = $request->file('path')->store('gallery', 'public');
+            $update['path'] = $request->file('image')->store('galleries', 'public');
         }
 
-        $gallery->update($data);
+        $gallery->update($update);
 
-        return redirect()->route('admin.galleries.index')->with('success','Gallery updated successfully.');
+        return redirect()->route('admin.galleries.index')->with('success', 'Gallery updated.');
     }
 
     public function destroy(Gallery $gallery)
@@ -65,6 +72,6 @@ class GalleryController extends Controller
         }
         $gallery->delete();
 
-        return redirect()->route('admin.galleries.index')->with('success','Gallery deleted successfully.');
+        return redirect()->route('admin.galleries.index')->with('success', 'Gallery deleted.');
     }
 }

@@ -1,73 +1,60 @@
 @extends('admin.layouts.app')
 
 @section('title', 'Doctors')
-@section('page_title', 'Doctors')
-
-@section('page_actions')
-    <a href="{{ route('admin.doctors.create') }}" class="btn btn-sm btn-primary shadow-sm">
-        <i class="fas fa-plus fa-sm text-white-50"></i> Add Doctor
-    </a>
-@endsection
 
 @section('content')
+<div class="d-flex align-items-center justify-content-between mb-3">
+    <h1 class="h3 mb-0 text-gray-800">Doctors</h1>
+    <a href="{{ route('admin.doctors.create') }}" class="btn btn-primary btn-sm">
+        <i class="fas fa-plus"></i> Add Doctor
+    </a>
+</div>
 
-    @if(session('success'))
-        <div class="alert alert-success">{{ session('success') }}</div>
-    @endif
+@if (session('success'))
+    <div class="alert alert-success">{{ session('success') }}</div>
+@endif
 
-    <div class="card shadow mb-4">
-        <div class="card-header py-3">
-            <h6 class="m-0 font-weight-bold text-primary">Doctors List</h6>
-        </div>
-
-        <div class="card-body table-responsive">
-            <table class="table table-bordered" width="100%" cellspacing="0">
-                <thead>
+<div class="card shadow mb-4">
+    <div class="card-body table-responsive">
+        <table class="table table-bordered table-hover mb-0">
+            <thead class="thead-light">
                 <tr>
                     <th>#</th>
                     <th>Image</th>
                     <th>Name</th>
                     <th>Specialty</th>
                     <th>Department</th>
-                    <th width="180">Actions</th>
+                    <th>Email</th>
+                    <th style="width:140px;">Actions</th>
                 </tr>
-                </thead>
-                <tbody>
-                @forelse($doctors as $doctor)
+            </thead>
+            <tbody>
+                @forelse($doctors as $d)
                     <tr>
-                        <td>{{ $doctor->id }}</td>
+                        <td>{{ ($doctors->currentPage() - 1) * $doctors->perPage() + $loop->iteration }}</td>
                         <td>
-                            @if($doctor->image)
-                                <img src="{{ asset('storage/'.$doctor->image) }}" width="60" height="60"
-                                     style="object-fit:cover;border-radius:8px;">
-                            @else
-                                <span class="text-muted">No image</span>
-                            @endif
+                            <img src="{{ $d->image ? asset('storage/'.$d->image) : asset('admin/img/undraw_profile.svg') }}"
+                                 style="width:60px;height:60px;object-fit:cover;border-radius:12px;">
                         </td>
-                        <td>{{ $doctor->name }}</td>
-                        <td>{{ $doctor->specialty }}</td>
-                        <td>{{ $doctor->department?->name ?? '-' }}</td>
+                        <td>{{ $d->name }}</td>
+                        <td>{{ $d->specialty }}</td>
+                        <td>{{ $d->department?->name }}</td>
+                        <td>{{ $d->email }}</td>
                         <td>
-                            <a class="btn btn-sm btn-warning" href="{{ route('admin.doctors.edit', $doctor) }}">Edit</a>
-
-                            <form class="d-inline" method="POST" action="{{ route('admin.doctors.destroy', $doctor) }}"
-                                  onsubmit="return confirm('Delete this doctor?')">
-                                @csrf
-                                @method('DELETE')
-                                <button class="btn btn-sm btn-danger">Delete</button>
+                            <a href="{{ route('admin.doctors.edit', $d) }}" class="btn btn-sm btn-warning">Edit</a>
+                            <form action="{{ route('admin.doctors.destroy', $d) }}" method="POST" class="d-inline">
+                                @csrf @method('DELETE')
+                                <button class="btn btn-sm btn-danger" onclick="return confirm('Delete?')">Delete</button>
                             </form>
                         </td>
                     </tr>
                 @empty
-                    <tr><td colspan="6" class="text-center text-muted">No doctors found.</td></tr>
+                    <tr><td colspan="7" class="text-center text-muted">No doctors.</td></tr>
                 @endforelse
-                </tbody>
-            </table>
-
-            <div class="mt-3">
-                {{ $doctors->links() }}
-            </div>
-        </div>
+            </tbody>
+        </table>
     </div>
+</div>
 
+{{ $doctors->links() }}
 @endsection

@@ -23,10 +23,10 @@ class TestimonialController extends Controller
     public function store(Request $request)
     {
         $data = $request->validate([
-            'name' => ['required','string','max:255'],
-            'job_title' => ['required','string','max:255'],
-            'comment' => ['required','string'],
-            'image' => ['nullable','image','mimes:jpg,jpeg,png,webp','max:2048'],
+            'name'      => ['required', 'string', 'max:255'],
+            'job_title' => ['required', 'string', 'max:255'],
+            'comment'   => ['required', 'string'],
+            'image'     => ['nullable', 'image', 'mimes:jpg,jpeg,png,webp', 'max:2048'],
         ]);
 
         if ($request->hasFile('image')) {
@@ -35,7 +35,7 @@ class TestimonialController extends Controller
 
         Testimonial::create($data);
 
-        return redirect()->route('admin.testimonials.index')->with('success','Testimonial created successfully.');
+        return redirect()->route('admin.testimonials.index')->with('success', 'Testimonial created.');
     }
 
     public function edit(Testimonial $testimonial)
@@ -46,10 +46,10 @@ class TestimonialController extends Controller
     public function update(Request $request, Testimonial $testimonial)
     {
         $data = $request->validate([
-            'name' => ['required','string','max:255'],
-            'job_title' => ['required','string','max:255'],
-            'comment' => ['required','string'],
-            'image' => ['nullable','image','mimes:jpg,jpeg,png,webp','max:2048'],
+            'name'      => ['required', 'string', 'max:255'],
+            'job_title' => ['required', 'string', 'max:255'],
+            'comment'   => ['required', 'string'],
+            'image'     => ['nullable', 'image', 'mimes:jpg,jpeg,png,webp', 'max:2048'],
         ]);
 
         if ($request->hasFile('image')) {
@@ -61,7 +61,7 @@ class TestimonialController extends Controller
 
         $testimonial->update($data);
 
-        return redirect()->route('admin.testimonials.index')->with('success','Testimonial updated successfully.');
+        return redirect()->route('admin.testimonials.index')->with('success', 'Testimonial updated.');
     }
 
     public function destroy(Testimonial $testimonial)
@@ -71,6 +71,6 @@ class TestimonialController extends Controller
         }
         $testimonial->delete();
 
-        return redirect()->route('admin.testimonials.index')->with('success','Testimonial deleted successfully.');
+        return redirect()->route('admin.testimonials.index')->with('success', 'Testimonial deleted.');
     }
 }
