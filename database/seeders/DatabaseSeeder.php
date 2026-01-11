@@ -63,10 +63,10 @@ class DatabaseSeeder extends Seeder
         ])->map(fn ($doc) => Doctor::create($doc));
 
         // FAQs 
-        collect([
-            ['question' => 'How to book an appointment?', 'answer' => 'Go to appointments section and fill the form.', 'display_order' => 1],
-            ['question' => 'Do you accept insurance?', 'answer' => 'Yes, we accept most insurance plans.', 'display_order' => 2],
-            ['question' => 'What are working hours?', 'answer' => 'We are open from 8 AM to 8 PM.', 'display_order' => 3],
+         collect([
+            ['question' => 'How to book an appointment?', 'answer' => 'Go to appointments and fill the form.', 'sort_order' => 1],
+            ['question' => 'Do you accept insurance?', 'answer' => 'Yes, we accept most insurance plans.', 'sort_order' => 2],
+            ['question' => 'What are working hours?', 'answer' => 'We are open from 8 AM to 8 PM.', 'sort_order' => 3],
         ])->each(fn ($f) => Faq::create($f));
 
         // Testimonials
@@ -77,8 +77,8 @@ class DatabaseSeeder extends Seeder
 
         // Galleries
         collect([
-            ['caption' => 'Reception Area', 'image' => null],
-            ['caption' => 'Clinic Room', 'image' => null],
+            ['caption' => 'Reception Area', 'path' => null],
+            ['caption' => 'Clinic Room', 'path' => null],
         ])->each(fn ($g) => Gallery::create($g));
 
         // Appointments

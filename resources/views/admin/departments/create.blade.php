@@ -18,30 +18,17 @@
 
         <div class="card-body">
             <form action="{{ route('admin.departments.store') }}" method="POST" enctype="multipart/form-data">
-                @csrf
+            @csrf
 
-                <div class="form-group">
-                    <label>Name</label>
-                    <input type="text" name="name" value="{{ old('name') }}"
-                           class="form-control @error('name') is-invalid @enderror">
-                    @error('name') <div class="invalid-feedback">{{ $message }}</div> @enderror
-                </div>
+            <input type="text" name="name" class="form-control mb-3" placeholder="Name" required>
 
-                <div class="form-group">
-                    <label>Description</label>
-                    <textarea name="description" rows="5"
-                              class="form-control @error('description') is-invalid @enderror">{{ old('description') }}</textarea>
-                    @error('description') <div class="invalid-feedback">{{ $message }}</div> @enderror
-                </div>
+            <textarea name="description" class="form-control mb-3" placeholder="Description" required></textarea>
 
-                <div class="form-group">
-                    <label>Image (optional)</label>
-                    <input type="file" name="image" class="form-control-file @error('image') is-invalid @enderror">
-                    @error('image') <div class="text-danger small mt-1">{{ $message }}</div> @enderror
-                </div>
+            <input type="file" name="image" class="form-control mb-3" required>
 
-                <button class="btn btn-primary" type="submit">Save</button>
-            </form>
+            <button class="btn btn-primary">Save</button>
+        </form>
+
         </div>
     </div>
 

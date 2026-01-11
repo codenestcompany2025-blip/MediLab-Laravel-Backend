@@ -18,29 +18,29 @@
         <form action="{{ route('admin.testimonials.store') }}" method="POST" enctype="multipart/form-data">
             @csrf
 
-            <div class="form-group">
-                <label>Name *</label>
-                <input type="text" name="name" class="form-control" value="{{ old('name') }}" required>
+            <div class="mb-3">
+                <label>Name</label>
+                <input type="text" name="name" class="form-control" required value="{{ old('name') }}">
             </div>
 
-            <div class="form-group">
-                <label>Job Title *</label>
-                <input type="text" name="job_title" class="form-control" value="{{ old('job_title') }}" required>
+            <div class="mb-3">
+                <label>Job Title</label>
+                <input type="text" name="job_title" class="form-control" required value="{{ old('job_title') }}">
             </div>
 
-            <div class="form-group">
-                <label>Comment *</label>
-                <textarea name="comment" class="form-control" rows="5" required>{{ old('comment') }}</textarea>
+            <div class="mb-3">
+                <label>Comment</label>
+                <textarea name="comment" class="form-control" required>{{ old('comment') }}</textarea>
             </div>
 
-            <div class="form-group">
-                <label>Image</label>
-                <input type="file" name="image" class="form-control-file" accept="image/*">
+            <div class="mb-3">
+                <label>Image *</label>
+                <input type="file" name="image" class="form-control" required>
             </div>
 
             <button class="btn btn-primary">Save</button>
-            <a href="{{ route('admin.testimonials.index') }}" class="btn btn-secondary">Cancel</a>
         </form>
+
     </div>
 </div>
 @endsection

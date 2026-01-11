@@ -10,10 +10,10 @@ use Illuminate\Support\Facades\Storage;
 class DepartmentController extends Controller
 {
     public function index()
-    {
-        $departments = Department::latest()->paginate(10);
-        return view('admin.departments.index', compact('departments'));
-    }
+  {      
+    $departments = \App\Models\Department::latest()->paginate(10);
+    return view('admin.departments.index', compact('departments'));
+  }
 
     public function create()
     {
@@ -23,19 +23,16 @@ class DepartmentController extends Controller
     public function store(Request $request)
     {
         $data = $request->validate([
-            'name' => ['required', 'string', 'max:255'],
+            'name'        => ['required', 'string', 'max:255'],
             'description' => ['required', 'string'],
-            'image' => ['nullable', 'image', 'mimes:jpg,jpeg,png,webp', 'max:2048'],
+            'image'       => ['required', 'image', 'mimes:jpg,jpeg,png,webp', 'max:2048'],
         ]);
 
-        if ($request->hasFile('image')) {
-            $data['image'] = $request->file('image')->store('departments', 'public');
-        }
+        $data['image'] = $request->file('image')->store('departments', 'public');
 
         Department::create($data);
 
-        return redirect()->route('admin.departments.index')
-            ->with('success', 'Department created successfully.');
+        return redirect()->route('admin.departments.index')->with('success', 'Department added successfully.');
     }
 
     public function edit(Department $department)
@@ -46,23 +43,21 @@ class DepartmentController extends Controller
     public function update(Request $request, Department $department)
     {
         $data = $request->validate([
-            'name' => ['required', 'string', 'max:255'],
+            'name'        => ['required', 'string', 'max:255'],
             'description' => ['required', 'string'],
-            'image' => ['nullable', 'image', 'mimes:jpg,jpeg,png,webp', 'max:2048'],
+            'image'       => ['nullable', 'image', 'mimes:jpg,jpeg,png,webp', 'max:2048'],
         ]);
 
         if ($request->hasFile('image')) {
             if ($department->image && Storage::disk('public')->exists($department->image)) {
                 Storage::disk('public')->delete($department->image);
             }
-
             $data['image'] = $request->file('image')->store('departments', 'public');
         }
 
         $department->update($data);
 
-        return redirect()->route('admin.departments.index')
-            ->with('success', 'Department updated successfully.');
+        return redirect()->route('admin.departments.index')->with('success', 'Department updated successfully.');
     }
 
     public function destroy(Department $department)
@@ -73,7 +68,6 @@ class DepartmentController extends Controller
 
         $department->delete();
 
-        return redirect()->route('admin.departments.index')
-            ->with('success', 'Department deleted successfully.');
+        return back()->with('success', 'Department deleted successfully.');
     }
 }

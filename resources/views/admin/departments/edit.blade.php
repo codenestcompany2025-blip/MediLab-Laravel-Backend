@@ -18,40 +18,20 @@
 
         <div class="card-body">
             <form action="{{ route('admin.departments.update', $department) }}" method="POST" enctype="multipart/form-data">
-                @csrf
-                @method('PUT')
+            @csrf
+            @method('PUT')
 
-                <div class="form-group">
-                    <label>Name</label>
-                    <input type="text" name="name" value="{{ old('name', $department->name) }}"
-                           class="form-control @error('name') is-invalid @enderror">
-                    @error('name') <div class="invalid-feedback">{{ $message }}</div> @enderror
-                </div>
+            <input type="text" name="name" value="{{ $department->name }}" class="form-control mb-3" required>
 
-                <div class="form-group">
-                    <label>Description</label>
-                    <textarea name="description" rows="5"
-                              class="form-control @error('description') is-invalid @enderror">{{ old('description', $department->description) }}</textarea>
-                    @error('description') <div class="invalid-feedback">{{ $message }}</div> @enderror
-                </div>
+            <textarea name="description" class="form-control mb-3" required>{{ $department->description }}</textarea>
 
-                <div class="form-group">
-                    <label>Current Image</label><br>
-                    @if($department->image)
-                        <img src="{{ asset('storage/'.$department->image) }}" width="120" style="object-fit:cover;border-radius:10px;">
-                    @else
-                        <span class="text-muted">No image</span>
-                    @endif
-                </div>
+            <img src="{{ asset('storage/'.$department->image) }}" width="120" class="mb-3">
 
-                <div class="form-group">
-                    <label>Change Image (optional)</label>
-                    <input type="file" name="image" class="form-control-file @error('image') is-invalid @enderror">
-                    @error('image') <div class="text-danger small mt-1">{{ $message }}</div> @enderror
-                </div>
+            <input type="file" name="image" class="form-control mb-3">
 
-                <button class="btn btn-primary" type="submit">Update</button>
-            </form>
+            <button class="btn btn-primary">Update</button>
+        </form>
+
         </div>
     </div>
 

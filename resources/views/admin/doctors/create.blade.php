@@ -3,7 +3,10 @@
 @section('title', 'Add Doctor')
 
 @section('content')
-<h1 class="h3 mb-3 text-gray-800">Add Doctor</h1>
+<div class="d-flex align-items-center justify-content-between mb-3">
+    <h1 class="h3 mb-0 text-gray-800">Add Doctor</h1>
+    <a href="{{ route('admin.doctors.index') }}" class="btn btn-secondary btn-sm">Back</a>
+</div>
 
 @if ($errors->any())
     <div class="alert alert-danger">
@@ -23,6 +26,7 @@
                     <label>Name *</label>
                     <input type="text" name="name" class="form-control" value="{{ old('name') }}" required>
                 </div>
+
                 <div class="form-group col-md-6">
                     <label>Specialty *</label>
                     <input type="text" name="specialty" class="form-control" value="{{ old('specialty') }}" required>
@@ -32,7 +36,7 @@
             <div class="form-group">
                 <label>Department *</label>
                 <select name="department_id" class="form-control" required>
-                    <option value="">-- Select --</option>
+                    <option value="" disabled selected>Choose department</option>
                     @foreach($departments as $dep)
                         <option value="{{ $dep->id }}" @selected(old('department_id') == $dep->id)>{{ $dep->name }}</option>
                     @endforeach
@@ -46,11 +50,12 @@
 
             <div class="form-group">
                 <label>Password (optional)</label>
-                <input type="password" name="password" class="form-control" value="{{ old('password') }}">
+                <input type="password" name="password" class="form-control" value="">
+                <small class="text-muted">Leave empty if not needed.</small>
             </div>
 
             <div class="form-group">
-                <label>Bio</label>
+                <label>Bio (optional)</label>
                 <textarea name="bio" class="form-control" rows="5">{{ old('bio') }}</textarea>
             </div>
 
@@ -74,8 +79,8 @@
             </div>
 
             <div class="form-group">
-                <label>Image</label>
-                <input type="file" name="image" class="form-control-file" accept="image/*">
+                <label>Image *</label>
+                <input type="file" name="image" class="form-control-file" accept="image/*" required>
             </div>
 
             <button class="btn btn-primary">Save</button>

@@ -16,42 +16,41 @@
 <div class="card shadow mb-4">
     <div class="card-body">
         <form action="{{ route('admin.testimonials.update', $testimonial) }}" method="POST" enctype="multipart/form-data">
-            @csrf @method('PUT')
+            @csrf
+            @method('PUT')
 
-            <div class="form-group">
-                <label>Name *</label>
-                <input type="text" name="name" class="form-control"
-                       value="{{ old('name', $testimonial->name) }}" required>
+            <div class="mb-3">
+                <label>Name</label>
+                <input type="text" name="name" class="form-control" required value="{{ old('name', $testimonial->name) }}">
             </div>
 
-            <div class="form-group">
-                <label>Job Title *</label>
-                <input type="text" name="job_title" class="form-control"
-                       value="{{ old('job_title', $testimonial->job_title) }}" required>
+            <div class="mb-3">
+                <label>Job Title</label>
+                <input type="text" name="job_title" class="form-control" required value="{{ old('job_title', $testimonial->job_title) }}">
             </div>
 
-            <div class="form-group">
-                <label>Comment *</label>
-                <textarea name="comment" class="form-control" rows="5" required>{{ old('comment', $testimonial->comment) }}</textarea>
+            <div class="mb-3">
+                <label>Comment</label>
+                <textarea name="comment" class="form-control" required>{{ old('comment', $testimonial->comment) }}</textarea>
             </div>
 
-            <div class="form-group">
+            <div class="mb-3">
                 <label>Current Image</label><br>
-                <img
-                    src="{{ $testimonial->image ? asset('storage/'.$testimonial->image) : asset('admin/img/undraw_profile.svg') }}"
-                    alt="img"
-                    style="width:80px;height:80px;object-fit:cover;border-radius:12px;"
-                >
+                @if($testimonial->image)
+                    <img src="{{ asset('storage/'.$testimonial->image) }}" style="width:90px;height:90px;object-fit:cover;border-radius:50%;">
+                @else
+                    <span class="text-muted">No image</span>
+                @endif
             </div>
 
-            <div class="form-group">
-                <label>Change Image</label>
-                <input type="file" name="image" class="form-control-file" accept="image/*">
+            <div class="mb-3">
+                <label>New Image (optional)</label>
+                <input type="file" name="image" class="form-control">
             </div>
 
             <button class="btn btn-primary">Update</button>
-            <a href="{{ route('admin.testimonials.index') }}" class="btn btn-secondary">Cancel</a>
         </form>
+
     </div>
 </div>
 @endsection

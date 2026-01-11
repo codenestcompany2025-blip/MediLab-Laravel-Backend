@@ -24,7 +24,7 @@ class FaqController extends Controller
         $data = $request->validate([
             'question'   => ['required', 'string', 'max:255'],
             'answer'     => ['required', 'string'],
-            'sort_order' => ['required', 'integer', 'min:0'],
+            'sort_order' => ['required', 'integer', 'min:1'],
         ]);
 
         Faq::create($data);
@@ -42,7 +42,7 @@ class FaqController extends Controller
         $data = $request->validate([
             'question'   => ['required', 'string', 'max:255'],
             'answer'     => ['required', 'string'],
-            'sort_order' => ['required', 'integer', 'min:0'],
+            'sort_order' => ['required', 'integer', 'min:1'],
         ]);
 
         $faq->update($data);
@@ -53,7 +53,6 @@ class FaqController extends Controller
     public function destroy(Faq $faq)
     {
         $faq->delete();
-
         return redirect()->route('admin.faqs.index')->with('success', 'FAQ deleted.');
     }
 }

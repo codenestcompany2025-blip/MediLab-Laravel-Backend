@@ -12,7 +12,7 @@ return new class extends Migration
             $table->id();
             $table->string('question');
             $table->text('answer');
-            $table->unsignedInteger('display_order')->default(0);
+            $table->unsignedInteger('sort_order')->default(0);
             $table->timestamps();
         });
     }

@@ -16,46 +16,48 @@
 
 <div class="card shadow mb-4">
     <div class="card-body">
+
         <div class="table-responsive">
-            <table class="table table-bordered">
+            <table class="table table-bordered align-middle">
                 <thead>
                     <tr>
-                        <th>#</th>
-                        <th>Preview</th>
+                        <th style="width:70px;">#</th>
+                        <th style="width:200px;">Preview</th>
                         <th>Caption</th>
-                        <th>Actions</th>
+                        <th style="width:180px;">Actions</th>
                     </tr>
                 </thead>
+
                 <tbody>
                 @forelse($galleries as $gallery)
                     <tr>
                         <td>{{ ($galleries->currentPage() - 1) * $galleries->perPage() + $loop->iteration }}</td>
-                        <td style="width:160px">
+
+                        <td>
                             @if($gallery->path)
-                                <img
-                                    src="{{ \Illuminate\Support\Facades\Storage::url($gallery->path) }}"
-                                    alt="gallery"
-                                    style="width:140px;height:80px;object-fit:cover;border-radius:8px;"
-                                    onerror="this.style.display='none'; this.nextElementSibling.style.display='block';"
-                                >
-                                <span style="display:none;color:#999;">Image not found</span>
+                                <img src="{{ asset('storage/'.$gallery->path) }}"
+                                     style="width:180px;height:110px;object-fit:cover;border-radius:6px;">
                             @else
                                 <span class="text-muted">No image</span>
                             @endif
                         </td>
+
                         <td>{{ $gallery->caption }}</td>
-                        <td style="width:180px">
+
+                        <td>
                             <a href="{{ route('admin.galleries.edit', $gallery) }}" class="btn btn-warning btn-sm">Edit</a>
 
                             <form action="{{ route('admin.galleries.destroy', $gallery) }}" method="POST" class="d-inline">
                                 @csrf
                                 @method('DELETE')
-                                <button onclick="return confirm('Delete?')" class="btn btn-danger btn-sm">Delete</button>
+                                <button onclick="return confirm('Delete this image?')" class="btn btn-danger btn-sm">Delete</button>
                             </form>
                         </td>
                     </tr>
                 @empty
-                    <tr><td colspan="4" class="text-center text-muted">No images found.</td></tr>
+                    <tr>
+                        <td colspan="4" class="text-center text-muted">No gallery images found.</td>
+                    </tr>
                 @endforelse
                 </tbody>
             </table>

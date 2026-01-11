@@ -26,12 +26,10 @@ class TestimonialController extends Controller
             'name'      => ['required', 'string', 'max:255'],
             'job_title' => ['required', 'string', 'max:255'],
             'comment'   => ['required', 'string'],
-            'image'     => ['nullable', 'image', 'mimes:jpg,jpeg,png,webp', 'max:2048'],
+            'image'     => ['required', 'image', 'mimes:jpg,jpeg,png,webp', 'max:2048'],
         ]);
 
-        if ($request->hasFile('image')) {
-            $data['image'] = $request->file('image')->store('testimonials', 'public');
-        }
+        $data['image'] = $request->file('image')->store('testimonials', 'public');
 
         Testimonial::create($data);
 
@@ -69,6 +67,7 @@ class TestimonialController extends Controller
         if ($testimonial->image && Storage::disk('public')->exists($testimonial->image)) {
             Storage::disk('public')->delete($testimonial->image);
         }
+
         $testimonial->delete();
 
         return redirect()->route('admin.testimonials.index')->with('success', 'Testimonial deleted.');

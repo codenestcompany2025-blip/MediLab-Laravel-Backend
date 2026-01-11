@@ -17,15 +17,15 @@
 <div class="card shadow mb-4">
     <div class="card-body">
         <div class="table-responsive">
-            <table class="table table-bordered">
+            <table class="table table-bordered align-middle">
                 <thead>
                     <tr>
-                        <th>#</th>
-                        <th>Image</th>
+                        <th style="width:70px">#</th>
+                        <th style="width:140px">Image</th>
                         <th>Name</th>
                         <th>Job Title</th>
                         <th>Comment</th>
-                        <th>Actions</th>
+                        <th style="width:180px">Actions</th>
                     </tr>
                 </thead>
 
@@ -36,30 +36,36 @@
                             {{ ($testimonials->currentPage() - 1) * $testimonials->perPage() + $loop->iteration }}
                         </td>
 
-                        <td style="width:140px">
-                            @if($t->image)
-                                <img
-                                src="{{ $t->image ? asset('storage/'.$t->image) : asset('admin/img/undraw_posting_photo.svg') }}"
+                        <td>
+                            @php
+                                $img = $t->image
+                                    ? asset('storage/'.$t->image)
+                                    : asset('admin/img/undraw_posting_photo.svg');
+                            @endphp
+
+                            <img
+                                src="{{ $img }}"
                                 alt="testimonial"
                                 style="width:80px;height:80px;object-fit:cover;border-radius:50%;"
+                                onerror="this.src='{{ asset('admin/img/undraw_posting_photo.svg') }}';"
                             >
-                                <span style="display:none;color:#999;">Image not found</span>
-                            @else
-                                <span class="text-muted">No image</span>
-                            @endif
                         </td>
 
                         <td>{{ $t->name }}</td>
                         <td>{{ $t->job_title }}</td>
                         <td>{{ \Illuminate\Support\Str::limit($t->comment, 80) }}</td>
 
-                        <td style="width:180px">
-                            <a href="{{ route('admin.testimonials.edit', $t) }}" class="btn btn-warning btn-sm">Edit</a>
+                        <td>
+                            <a href="{{ route('admin.testimonials.edit', $t) }}" class="btn btn-warning btn-sm">
+                                Edit
+                            </a>
 
                             <form action="{{ route('admin.testimonials.destroy', $t) }}" method="POST" class="d-inline">
                                 @csrf
                                 @method('DELETE')
-                                <button onclick="return confirm('Delete?')" class="btn btn-danger btn-sm">Delete</button>
+                                <button type="submit" onclick="return confirm('Delete this testimonial?')" class="btn btn-danger btn-sm">
+                                    Delete
+                                </button>
                             </form>
                         </td>
                     </tr>

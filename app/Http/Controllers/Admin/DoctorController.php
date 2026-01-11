@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Models\Doctor;
 use App\Models\Department;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Storage;
 
 class DoctorController extends Controller
@@ -18,7 +19,7 @@ class DoctorController extends Controller
 
     public function create()
     {
-        $departments = Department::orderBy('name')->get();
+        $departments = Department::all();
         return view('admin.doctors.create', compact('departments'));
     }
 
@@ -28,33 +29,33 @@ class DoctorController extends Controller
             'name'          => ['required', 'string', 'max:255'],
             'specialty'     => ['required', 'string', 'max:255'],
             'department_id' => ['required', 'exists:departments,id'],
-
+            'email'         => ['nullable', 'email', 'unique:doctors,email'],
+            'password'      => ['nullable', 'string', 'min:8'],
             'bio'           => ['nullable', 'string'],
-            'email'         => ['nullable', 'email', 'max:255', 'unique:doctors,email'],
-            'password'      => ['nullable', 'string', 'min:6'],
-
             'facebook'      => ['nullable', 'string', 'max:255'],
             'twitter'       => ['nullable', 'string', 'max:255'],
             'instagram'     => ['nullable', 'string', 'max:255'],
             'linkedin'      => ['nullable', 'string', 'max:255'],
-
-            'image'         => ['nullable', 'image', 'mimes:jpg,jpeg,png,webp', 'max:2048'],
+            'image'         => ['required', 'image', 'mimes:jpg,jpeg,png,webp', 'max:2048'],
         ]);
 
-        if ($request->hasFile('image')) {
-            $data['image'] = $request->file('image')->store('doctors', 'public');
-        }
+        $data['image'] = $request->file('image')->store('doctors', 'public');
 
-        if (empty($data['password'])) unset($data['password']);
+        // hash password if provided
+        if (!empty($data['password'])) {
+            $data['password'] = Hash::make($data['password']);
+        } else {
+            $data['password'] = null;
+        }
 
         Doctor::create($data);
 
-        return redirect()->route('admin.doctors.index')->with('success', 'Doctor created.');
+        return redirect()->route('admin.doctors.index')->with('success', 'Doctor added successfully.');
     }
 
     public function edit(Doctor $doctor)
     {
-        $departments = Department::orderBy('name')->get();
+        $departments = Department::all();
         return view('admin.doctors.edit', compact('doctor', 'departments'));
     }
 
@@ -64,16 +65,13 @@ class DoctorController extends Controller
             'name'          => ['required', 'string', 'max:255'],
             'specialty'     => ['required', 'string', 'max:255'],
             'department_id' => ['required', 'exists:departments,id'],
-
+            'email'         => ['nullable', 'email', 'unique:doctors,email,' . $doctor->id],
+            'password'      => ['nullable', 'string', 'min:8'],
             'bio'           => ['nullable', 'string'],
-            'email'         => ['nullable', 'email', 'max:255', 'unique:doctors,email,' . $doctor->id],
-            'password'      => ['nullable', 'string', 'min:6'],
-
             'facebook'      => ['nullable', 'string', 'max:255'],
             'twitter'       => ['nullable', 'string', 'max:255'],
             'instagram'     => ['nullable', 'string', 'max:255'],
             'linkedin'      => ['nullable', 'string', 'max:255'],
-
             'image'         => ['nullable', 'image', 'mimes:jpg,jpeg,png,webp', 'max:2048'],
         ]);
 
@@ -84,12 +82,16 @@ class DoctorController extends Controller
             $data['image'] = $request->file('image')->store('doctors', 'public');
         }
 
-        if (empty($data['password'])) unset($data['password']);
-        if (!array_key_exists('email', $data) || empty($data['email'])) unset($data['email']);
+        // hash password only if provided (otherwise keep old)
+        if (!empty($data['password'])) {
+            $data['password'] = Hash::make($data['password']);
+        } else {
+            unset($data['password']);
+        }
 
         $doctor->update($data);
 
-        return redirect()->route('admin.doctors.index')->with('success', 'Doctor updated.');
+        return redirect()->route('admin.doctors.index')->with('success', 'Doctor updated successfully.');
     }
 
     public function destroy(Doctor $doctor)
@@ -97,8 +99,9 @@ class DoctorController extends Controller
         if ($doctor->image && Storage::disk('public')->exists($doctor->image)) {
             Storage::disk('public')->delete($doctor->image);
         }
+
         $doctor->delete();
 
-        return redirect()->route('admin.doctors.index')->with('success', 'Doctor deleted.');
+        return back()->with('success', 'Doctor deleted successfully.');
     }
 }

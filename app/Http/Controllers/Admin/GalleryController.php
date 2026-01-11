@@ -11,7 +11,7 @@ class GalleryController extends Controller
 {
     public function index()
     {
-        $galleries = Gallery::latest()->paginate(12);
+        $galleries = Gallery::latest()->paginate(10);
         return view('admin.galleries.index', compact('galleries'));
     }
 
@@ -24,17 +24,18 @@ class GalleryController extends Controller
     {
         $data = $request->validate([
             'caption' => ['nullable', 'string', 'max:255'],
-            'image'   => ['required', 'image', 'mimes:jpg,jpeg,png,webp', 'max:4096'],
+            'image'   => ['required', 'image', 'mimes:jpg,jpeg,png,webp', 'max:2048'],
         ]);
 
+        // upload image to storage/app/public/galleries
         $path = $request->file('image')->store('galleries', 'public');
 
         Gallery::create([
             'caption' => $data['caption'] ?? null,
-            'path' => $path,
+            'path'    => $path,
         ]);
 
-        return redirect()->route('admin.galleries.index')->with('success', 'Gallery image added.');
+        return redirect()->route('admin.galleries.index')->with('success', 'Gallery image added successfully.');
     }
 
     public function edit(Gallery $gallery)
@@ -46,23 +47,22 @@ class GalleryController extends Controller
     {
         $data = $request->validate([
             'caption' => ['nullable', 'string', 'max:255'],
-            'image'   => ['nullable', 'image', 'mimes:jpg,jpeg,png,webp', 'max:4096'],
+            'image'   => ['nullable', 'image', 'mimes:jpg,jpeg,png,webp', 'max:2048'],
         ]);
 
-        $update = [
-            'caption' => $data['caption'] ?? null,
-        ];
-
         if ($request->hasFile('image')) {
+            // delete old image
             if ($gallery->path && Storage::disk('public')->exists($gallery->path)) {
                 Storage::disk('public')->delete($gallery->path);
             }
-            $update['path'] = $request->file('image')->store('galleries', 'public');
+
+            $gallery->path = $request->file('image')->store('galleries', 'public');
         }
 
-        $gallery->update($update);
+        $gallery->caption = $data['caption'] ?? null;
+        $gallery->save();
 
-        return redirect()->route('admin.galleries.index')->with('success', 'Gallery updated.');
+        return redirect()->route('admin.galleries.index')->with('success', 'Gallery updated successfully.');
     }
 
     public function destroy(Gallery $gallery)
@@ -70,8 +70,9 @@ class GalleryController extends Controller
         if ($gallery->path && Storage::disk('public')->exists($gallery->path)) {
             Storage::disk('public')->delete($gallery->path);
         }
+
         $gallery->delete();
 
-        return redirect()->route('admin.galleries.index')->with('success', 'Gallery deleted.');
+        return redirect()->route('admin.galleries.index')->with('success', 'Gallery deleted successfully.');
     }
 }
