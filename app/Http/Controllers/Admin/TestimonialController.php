@@ -3,8 +3,9 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
+use App\Http\Requests\Admin\StoreTestimonialRequest;
+use App\Http\Requests\Admin\UpdateTestimonialRequest;
 use App\Models\Testimonial;
-use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
 
 class TestimonialController extends Controller
@@ -20,20 +21,15 @@ class TestimonialController extends Controller
         return view('admin.testimonials.create');
     }
 
-    public function store(Request $request)
+    public function store(StoreTestimonialRequest $request)
     {
-        $data = $request->validate([
-            'name'      => ['required', 'string', 'max:255'],
-            'job_title' => ['required', 'string', 'max:255'],
-            'comment'   => ['required', 'string'],
-            'image'     => ['required', 'image', 'mimes:jpg,jpeg,png,webp', 'max:2048'],
-        ]);
-
+        $data = $request->validated();
         $data['image'] = $request->file('image')->store('testimonials', 'public');
 
         Testimonial::create($data);
 
-        return redirect()->route('admin.testimonials.index')->with('success', 'Testimonial created.');
+        return redirect()->route('admin.testimonials.index')
+            ->with('success', 'Testimonial created successfully.');
     }
 
     public function edit(Testimonial $testimonial)
@@ -41,14 +37,9 @@ class TestimonialController extends Controller
         return view('admin.testimonials.edit', compact('testimonial'));
     }
 
-    public function update(Request $request, Testimonial $testimonial)
+    public function update(UpdateTestimonialRequest $request, Testimonial $testimonial)
     {
-        $data = $request->validate([
-            'name'      => ['required', 'string', 'max:255'],
-            'job_title' => ['required', 'string', 'max:255'],
-            'comment'   => ['required', 'string'],
-            'image'     => ['nullable', 'image', 'mimes:jpg,jpeg,png,webp', 'max:2048'],
-        ]);
+        $data = $request->validated();
 
         if ($request->hasFile('image')) {
             if ($testimonial->image && Storage::disk('public')->exists($testimonial->image)) {
@@ -59,7 +50,8 @@ class TestimonialController extends Controller
 
         $testimonial->update($data);
 
-        return redirect()->route('admin.testimonials.index')->with('success', 'Testimonial updated.');
+        return redirect()->route('admin.testimonials.index')
+            ->with('success', 'Testimonial updated successfully.');
     }
 
     public function destroy(Testimonial $testimonial)
@@ -70,6 +62,7 @@ class TestimonialController extends Controller
 
         $testimonial->delete();
 
-        return redirect()->route('admin.testimonials.index')->with('success', 'Testimonial deleted.');
+        return redirect()->route('admin.testimonials.index')
+            ->with('success', 'Testimonial deleted successfully.');
     }
 }

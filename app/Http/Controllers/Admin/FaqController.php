@@ -3,8 +3,9 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
+use App\Http\Requests\Admin\StoreFaqRequest;
+use App\Http\Requests\Admin\UpdateFaqRequest;
 use App\Models\Faq;
-use Illuminate\Http\Request;
 
 class FaqController extends Controller
 {
@@ -19,17 +20,13 @@ class FaqController extends Controller
         return view('admin.faqs.create');
     }
 
-    public function store(Request $request)
+    public function store(StoreFaqRequest $request)
     {
-        $data = $request->validate([
-            'question'   => ['required', 'string', 'max:255'],
-            'answer'     => ['required', 'string'],
-            'sort_order' => ['required', 'integer', 'min:1'],
-        ]);
-
+        $data = $request->validated();
         Faq::create($data);
 
-        return redirect()->route('admin.faqs.index')->with('success', 'FAQ created.');
+        return redirect()->route('admin.faqs.index')
+            ->with('success', 'FAQ created successfully.');
     }
 
     public function edit(Faq $faq)
@@ -37,22 +34,20 @@ class FaqController extends Controller
         return view('admin.faqs.edit', compact('faq'));
     }
 
-    public function update(Request $request, Faq $faq)
+    public function update(UpdateFaqRequest $request, Faq $faq)
     {
-        $data = $request->validate([
-            'question'   => ['required', 'string', 'max:255'],
-            'answer'     => ['required', 'string'],
-            'sort_order' => ['required', 'integer', 'min:1'],
-        ]);
-
+        $data = $request->validated();
         $faq->update($data);
 
-        return redirect()->route('admin.faqs.index')->with('success', 'FAQ updated.');
+        return redirect()->route('admin.faqs.index')
+            ->with('success', 'FAQ updated successfully.');
     }
 
     public function destroy(Faq $faq)
     {
         $faq->delete();
-        return redirect()->route('admin.faqs.index')->with('success', 'FAQ deleted.');
+
+        return redirect()->route('admin.faqs.index')
+            ->with('success', 'FAQ deleted successfully.');
     }
 }
