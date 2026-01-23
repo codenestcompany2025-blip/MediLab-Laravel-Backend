@@ -1,85 +1,144 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="utf-8">
-    <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <meta content="width=device-width, initial-scale=1.0" name="viewport">
 
     <title>@yield('title', 'MediLab')</title>
+    <meta name="description" content="@yield('meta_description', '')">
+    <meta name="keywords" content="@yield('meta_keywords', '')">
 
-    {{-- FontAwesome --}}
-    <link href="{{ asset('admin/vendor/fontawesome-free/css/all.min.css') }}" rel="stylesheet">
+    <!-- Favicons -->
+    <link href="{{ asset('medilab/assets/img/favicon.png') }}" rel="icon">
+    <link href="{{ asset('medilab/assets/img/apple-touch-icon.png') }}" rel="apple-touch-icon">
 
-    {{-- SB Admin 2 CSS --}}
-    <link href="{{ asset('admin/css/sb-admin-2.min.css') }}" rel="stylesheet">
+    <!-- Fonts -->
+    <link href="https://fonts.googleapis.com" rel="preconnect">
+    <link href="https://fonts.gstatic.com" rel="preconnect" crossorigin>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Roboto:wght@100;300;400;500;700;900&family=Poppins:wght@100;200;300;400;500;600;700;800;900&family=Raleway:wght@100;200;300;400;500;600;700;800;900&display=swap"
+        rel="stylesheet">
 
-    <!-- Google Font: Nunito -->
-    <link href="https://fonts.googleapis.com/css?family=Nunito:200,300,400,600,700,800,900" rel="stylesheet">
+    <!-- Vendor CSS Files -->
+    <link href="{{ asset('medilab/assets/vendor/bootstrap/css/bootstrap.min.css') }}" rel="stylesheet">
+    <link href="{{ asset('medilab/assets/vendor/bootstrap-icons/bootstrap-icons.css') }}" rel="stylesheet">
+    <link href="{{ asset('medilab/assets/vendor/aos/aos.css') }}" rel="stylesheet">
+    <link href="{{ asset('medilab/assets/vendor/fontawesome-free/css/all.min.css') }}" rel="stylesheet">
+    <link href="{{ asset('medilab/assets/vendor/glightbox/css/glightbox.min.css') }}" rel="stylesheet">
+    <link href="{{ asset('medilab/assets/vendor/swiper/swiper-bundle.min.css') }}" rel="stylesheet">
+
+    <!-- Main CSS File -->
+    <link href="{{ asset('medilab/assets/css/main.css') }}" rel="stylesheet">
 
     @stack('styles')
 
     <style>
-    body {
-        font-family: 'Nunito', sans-serif;
-    }
+        #gallery .gallery-item {
+            height: 220px;
+            overflow: hidden;
+        }
 
-    .medilab-brand {
-        font-family: 'Nunito', sans-serif;
-        font-weight: 800;    
-        font-size: 18px;
-        letter-spacing: 1px;
-        text-transform: uppercase;
-    }
+        #gallery .gallery-item img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            display: block;
+        }
 
-    .sidebar-brand-icon i {
-        font-size: 26px;
+        /* Appointment Button Styling */
+        #appointment button[type="submit"] {
+            background: #1977cc;
+            border: none;
+            padding: 12px 36px;
+            color: #fff;
+            font-size: 16px;
+            font-weight: 500;
+            border-radius: 50px;
+            transition: all 0.3s ease;
+            box-shadow: 0 6px 18px rgba(25, 119, 204, 0.35);
+        }
+
+        /* Hover effect */
+        #appointment button[type="submit"]:hover {
+            background: #166ab5;
+            transform: translateY(-2px);
+            box-shadow: 0 10px 25px rgba(25, 119, 204, 0.45);
+        }
+
+        /* Active (click) */
+        #appointment button[type="submit"]:active {
+            transform: translateY(0);
+            box-shadow: 0 4px 12px rgba(25, 119, 204, 0.3);
+        }
+
+        /* Success alert styling */
+        #appointment .alert-success {
+            background: #e8f4ff;
+            color: #0b5ed7;
+            border: none;
+            border-left: 5px solid #1977cc;
+            padding: 15px 20px;
+            border-radius: 8px;
+            font-size: 15px;
+        }
+
+        /* Contact Form Button Styling */
+        #contact button[type="submit"] {
+            background: #1977cc;
+            border: none;
+            padding: 12px 34px;
+            color: #fff;
+            font-size: 16px;
+            font-weight: 500;
+            border-radius: 50px;
+            transition: all 0.3s ease;
+            box-shadow: 0 6px 18px rgba(25, 119, 204, 0.35);
+        }
+
+        /* Hover */
+        #contact button[type="submit"]:hover {
+            background: #166ab5;
+            transform: translateY(-2px);
+            box-shadow: 0 10px 25px rgba(25, 119, 204, 0.45);
+        }
+
+        /* Active */
+        #contact button[type="submit"]:active {
+            transform: translateY(0);
+            box-shadow: 0 4px 12px rgba(25, 119, 204, 0.3);
+        }
+
+        @media (max-width: 576px) {
+    #contact button[type="submit"] {
+        width: 100%;
     }
-</style>
+}
+
+    </style>
 </head>
 
-<body id="page-top">
+<body class="@yield('body_class', 'index-page')">
 
-<div id="wrapper">
+    @include('front.partials.header')
 
-    {{-- Sidebar --}}
-    @include('front.partials.sidebar')
+    <main class="main">
+        @yield('content')
+    </main>
 
-    {{-- Content Wrapper --}}
-    <div id="content-wrapper" class="d-flex flex-column">
+    @include('front.partials.footer')
 
-        {{-- Main Content --}}
-        <div id="content">
+    <!-- Vendor JS Files -->
+    <script src="{{ asset('medilab/assets/vendor/bootstrap/js/bootstrap.bundle.min.js') }}"></script>
+    <script src="{{ asset('medilab/assets/vendor/aos/aos.js') }}"></script>
+    <script src="{{ asset('medilab/assets/vendor/glightbox/js/glightbox.min.js') }}"></script>
+    <script src="{{ asset('medilab/assets/vendor/purecounter/purecounter_vanilla.js') }}"></script>
+    <script src="{{ asset('medilab/assets/vendor/swiper/swiper-bundle.min.js') }}"></script>
 
-            {{-- Topbar --}}
-            @include('front.partials.topbar')
+    <!-- Main JS File -->
+    <script src="{{ asset('medilab/assets/js/main.js') }}"></script>
 
-            {{-- Page Content --}}
-            <div class="container-fluid">
-                @yield('content')
-            </div>
-
-        </div>
-
-        {{-- Footer --}}
-        @include('front.partials.footer')
-
-    </div>
-</div>
-
-{{-- Scroll to Top Button--}}
-<a class="scroll-to-top rounded" href="#page-top">
-    <i class="fas fa-angle-up"></i>
-</a>
-
-{{-- jQuery --}}
-<script src="{{ asset('admin/vendor/jquery/jquery.min.js') }}"></script>
-
-{{-- Bootstrap bundle --}}
-<script src="{{ asset('admin/vendor/bootstrap/js/bootstrap.bundle.min.js') }}"></script>
-
-{{-- SB Admin 2 --}}
-<script src="{{ asset('admin/js/sb-admin-2.min.js') }}"></script>
-
-@stack('scripts')
+    @stack('scripts')
 </body>
+
 </html>

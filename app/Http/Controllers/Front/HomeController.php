@@ -13,21 +13,31 @@ use App\Models\Testimonial;
 class HomeController extends Controller
 {
     public function index()
-    {
-        $services     = Service::latest()->get();
-        $departments  = Department::latest()->get();
-        $doctors      = Doctor::latest()->get();
-        $galleries    = Gallery::latest()->get();
-        $faqs         = Faq::orderBy('sort_order')->get();
-        $testimonials = Testimonial::latest()->get();
+{
+    $services = \App\Models\Service::latest()->take(6)->get();
+    $departments = \App\Models\Department::orderBy('name')->get();
+    $doctors = \App\Models\Doctor::latest()->take(8)->get();
+    $galleries = \App\Models\Gallery::latest()->take(8)->get();
+    $faqs = \App\Models\Faq::orderBy('sort_order')->take(8)->get();
+    $testimonials = \App\Models\Testimonial::latest()->take(6)->get();
 
-        return view('front.index', compact(
-            'services',
-            'departments',
-            'doctors',
-            'galleries',
-            'faqs',
-            'testimonials'
-        ));
-    }
+    $allDepartments = \App\Models\Department::orderBy('name')->get();
+    $allDoctors = \App\Models\Doctor::orderBy('name')->get();
+
+    $doctorsCount = $allDoctors->count();
+    $departmentsCount = $allDepartments->count();
+
+    return view('front.index', compact(
+        'services',
+        'departments',
+        'doctors',
+        'galleries',
+        'faqs',
+        'testimonials',
+        'allDepartments',
+        'allDoctors',
+        'doctorsCount',
+        'departmentsCount'
+    ));
+}
 }

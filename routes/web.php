@@ -61,11 +61,13 @@ Route::middleware('auth:admin')->prefix('admin')->name('admin.')->group(function
 |--------------------------------------------------------------------------
 */
 Route::name('front.')->group(function () {
-    Route::get('/', [HomeController::class, 'index'])->name('home');
-    Route::get('/about', [HomeController::class, 'about'])->name('about');
-    Route::get('/services', [HomeController::class, 'services'])->name('services');
-    Route::get('/doctors', [HomeController::class, 'doctors'])->name('doctors');
-    Route::get('/gallery', [HomeController::class, 'gallery'])->name('gallery');
-    Route::get('/faq', [HomeController::class, 'faq'])->name('faq');
-    Route::get('/contact', [HomeController::class, 'contact'])->name('contact');
+
+    Route::get('/', [\App\Http\Controllers\Front\HomeController::class, 'index'])->name('home');
+
+    Route::post('/appointments', [\App\Http\Controllers\Front\AppointmentController::class, 'store'])
+        ->name('appointments.store');
+
+    Route::post('/contact', [\App\Http\Controllers\Front\ContactController::class, 'store'])
+        ->name('contact.store');
+
 });
