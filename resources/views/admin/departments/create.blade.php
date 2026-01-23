@@ -1,35 +1,46 @@
 @extends('admin.layouts.app')
 
-@section('title', 'Add Department')
-@section('page_title', 'Add Department')
-
-@section('page_actions')
-    <a href="{{ route('admin.departments.index') }}" class="btn btn-sm btn-secondary">
-        Back
-    </a>
-@endsection
+@section('title', 'Create Department')
 
 @section('content')
+<div class="d-flex align-items-center justify-content-between mb-3">
+    <h1 class="h3 mb-0 text-gray-800">Create Department</h1>
+    <a href="{{ route('admin.departments.index') }}" class="btn btn-secondary">Back</a>
+</div>
 
-    <div class="card shadow mb-4">
-        <div class="card-header py-3">
-            <h6 class="m-0 font-weight-bold text-primary">Create Department</h6>
-        </div>
+@if ($errors->any())
+    <div class="alert alert-danger">
+        <ul class="mb-0">
+            @foreach ($errors->all() as $error)
+                <li>{{ $error }}</li>
+            @endforeach
+        </ul>
+    </div>
+@endif
 
-        <div class="card-body">
-            <form action="{{ route('admin.departments.store') }}" method="POST" enctype="multipart/form-data">
+<div class="card shadow">
+    <div class="card-body">
+        <form action="{{ route('admin.departments.store') }}" method="POST" enctype="multipart/form-data">
             @csrf
 
-            <input type="text" name="name" class="form-control mb-3" placeholder="Name" required>
+            <div class="form-group">
+                <label>Name *</label>
+                <input type="text" name="name" class="form-control" value="{{ old('name') }}" required>
+            </div>
 
-            <textarea name="description" class="form-control mb-3" placeholder="Description" required></textarea>
+            <div class="form-group">
+                <label>Description</label>
+                <textarea name="description" class="form-control" rows="4">{{ old('description') }}</textarea>
+            </div>
 
-            <input type="file" name="image" class="form-control mb-3" required>
+            <div class="form-group">
+                <label>Image *</label>
+                <input type="file" name="image" class="form-control-file" required>
+            </div>
 
             <button class="btn btn-primary">Save</button>
+            <a href="{{ route('admin.departments.index') }}" class="btn btn-secondary">Cancel</a>
         </form>
-
-        </div>
     </div>
-
+</div>
 @endsection

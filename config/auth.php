@@ -36,9 +36,17 @@ return [
     */
 
     'guards' => [
-        'web' => [
+
+        // Default users (front / web)
+            'web' => [
             'driver' => 'session',
             'provider' => 'users',
+        ],
+
+        // Admin guard (separate session)
+            'admin' => [
+            'driver' => 'session',
+            'provider' => 'admins',
         ],
     ],
 
@@ -60,9 +68,17 @@ return [
     */
 
     'providers' => [
-        'users' => [
+
+        // Default users provider
+            'users' => [
             'driver' => 'eloquent',
             'model' => env('AUTH_MODEL', App\Models\User::class),
+        ],
+
+        // Admins provider
+            'admins' => [
+            'driver' => 'eloquent',
+            'model' => App\Models\Admin::class,
         ],
 
         // 'users' => [
@@ -91,8 +107,18 @@ return [
     */
 
     'passwords' => [
-        'users' => [
+
+        // Users password reset
+            'users' => [
             'provider' => 'users',
+            'table' => env('AUTH_PASSWORD_RESET_TOKEN_TABLE', 'password_reset_tokens'),
+            'expire' => 60,
+            'throttle' => 60,
+        ],
+
+        // Admins password reset (optional but recommended)
+            'admins' => [
+            'provider' => 'admins',
             'table' => env('AUTH_PASSWORD_RESET_TOKEN_TABLE', 'password_reset_tokens'),
             'expire' => 60,
             'throttle' => 60,

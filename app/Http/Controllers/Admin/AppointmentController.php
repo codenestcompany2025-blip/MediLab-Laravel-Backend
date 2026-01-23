@@ -3,16 +3,17 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
+use App\Http\Requests\Admin\StoreAppointmentRequest;
+use App\Http\Requests\Admin\UpdateAppointmentRequest;
 use App\Models\Appointment;
 use App\Models\Department;
 use App\Models\Doctor;
-use Illuminate\Http\Request;
 
 class AppointmentController extends Controller
 {
     public function index()
     {
-        $appointments = Appointment::with(['department','doctor'])
+        $appointments = Appointment::with(['department', 'doctor'])
             ->latest()
             ->paginate(10);
 
@@ -27,19 +28,9 @@ class AppointmentController extends Controller
         return view('admin.appointments.create', compact('departments', 'doctors'));
     }
 
-    public function store(Request $request)
+    public function store(StoreAppointmentRequest $request)
     {
-        $data = $request->validate([
-            'name'           => 'required|string|max:255',
-            'email'          => 'required|email|max:255',
-            'phone'          => 'required|string|max:50',
-            'appointment_at' => 'required|date',
-            'department_id'  => 'required|exists:departments,id',
-            'doctor_id'      => 'required|exists:doctors,id',
-            'message'        => 'nullable|string',
-            'status'         => 'required|in:pending,confirmed,cancelled',
-        ]);
-
+        $data = $request->validated();
         Appointment::create($data);
 
         return redirect()->route('admin.appointments.index')
@@ -51,22 +42,12 @@ class AppointmentController extends Controller
         $departments = Department::orderBy('name')->get();
         $doctors = Doctor::orderBy('name')->get();
 
-        return view('admin.appointments.edit', compact('appointment','departments','doctors'));
+        return view('admin.appointments.edit', compact('appointment', 'departments', 'doctors'));
     }
 
-    public function update(Request $request, Appointment $appointment)
+    public function update(UpdateAppointmentRequest $request, Appointment $appointment)
     {
-        $data = $request->validate([
-            'name'           => 'required|string|max:255',
-            'email'          => 'required|email|max:255',
-            'phone'          => 'required|string|max:50',
-            'appointment_at' => 'required|date',
-            'department_id'  => 'required|exists:departments,id',
-            'doctor_id'      => 'required|exists:doctors,id',
-            'message'        => 'nullable|string',
-            'status'         => 'required|in:pending,confirmed,cancelled',
-        ]);
-
+        $data = $request->validated();
         $appointment->update($data);
 
         return redirect()->route('admin.appointments.index')
@@ -79,16 +60,5 @@ class AppointmentController extends Controller
 
         return redirect()->route('admin.appointments.index')
             ->with('success', 'Appointment deleted successfully.');
-    }
-
-    public function updateStatus(Request $request, Appointment $appointment)
-    {
-        $data = $request->validate([
-            'status' => 'required|in:pending,confirmed,cancelled',
-        ]);
-
-        $appointment->update($data);
-
-        return back()->with('success', 'Status updated successfully.');
     }
 }

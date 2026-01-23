@@ -3,11 +3,11 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
-use App\Models\Doctor;
+use App\Http\Requests\Admin\StoreDoctorRequest;
+use App\Http\Requests\Admin\UpdateDoctorRequest;
 use App\Models\Department;
-use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Hash;
-use Illuminate\Support\Facades\Storage;
+use App\Models\Doctor;
+use Illuminate\Support\Facades\File;
 
 class DoctorController extends Controller
 {
@@ -19,74 +19,57 @@ class DoctorController extends Controller
 
     public function create()
     {
-        $departments = Department::all();
+        $departments = Department::orderBy('name')->get();
         return view('admin.doctors.create', compact('departments'));
     }
 
-    public function store(Request $request)
+    private function uploadImageToPublicStorage($file, string $folder): string
     {
-        $data = $request->validate([
-            'name'          => ['required', 'string', 'max:255'],
-            'specialty'     => ['required', 'string', 'max:255'],
-            'department_id' => ['required', 'exists:departments,id'],
-            'email'         => ['nullable', 'email', 'unique:doctors,email'],
-            'password'      => ['nullable', 'string', 'min:8'],
-            'bio'           => ['nullable', 'string'],
-            'facebook'      => ['nullable', 'string', 'max:255'],
-            'twitter'       => ['nullable', 'string', 'max:255'],
-            'instagram'     => ['nullable', 'string', 'max:255'],
-            'linkedin'      => ['nullable', 'string', 'max:255'],
-            'image'         => ['required', 'image', 'mimes:jpg,jpeg,png,webp', 'max:2048'],
-        ]);
+        $dir = public_path("storage/{$folder}");
+        File::ensureDirectoryExists($dir);
 
-        $data['image'] = $request->file('image')->store('doctors', 'public');
+        $filename = time() . '_' . uniqid() . '.' . $file->getClientOriginalExtension();
+        $file->move($dir, $filename);
 
-        // hash password if provided
-        if (!empty($data['password'])) {
-            $data['password'] = Hash::make($data['password']);
-        } else {
-            $data['password'] = null;
+        return "{$folder}/{$filename}";
+    }
+
+    private function deletePublicStorageFile(?string $relativePath): void
+    {
+        if (!$relativePath) return;
+
+        $fullPath = public_path('storage/' . $relativePath);
+        if (File::exists($fullPath)) {
+            File::delete($fullPath);
+        }
+    }
+
+    public function store(StoreDoctorRequest $request)
+    {
+        $data = $request->validated();
+
+        if ($request->hasFile('image')) {
+            $data['image'] = $this->uploadImageToPublicStorage($request->file('image'), 'doctors');
         }
 
         Doctor::create($data);
 
-        return redirect()->route('admin.doctors.index')->with('success', 'Doctor added successfully.');
+        return redirect()->route('admin.doctors.index')->with('success', 'Doctor created successfully.');
     }
 
     public function edit(Doctor $doctor)
     {
-        $departments = Department::all();
+        $departments = Department::orderBy('name')->get();
         return view('admin.doctors.edit', compact('doctor', 'departments'));
     }
 
-    public function update(Request $request, Doctor $doctor)
+    public function update(UpdateDoctorRequest $request, Doctor $doctor)
     {
-        $data = $request->validate([
-            'name'          => ['required', 'string', 'max:255'],
-            'specialty'     => ['required', 'string', 'max:255'],
-            'department_id' => ['required', 'exists:departments,id'],
-            'email'         => ['nullable', 'email', 'unique:doctors,email,' . $doctor->id],
-            'password'      => ['nullable', 'string', 'min:8'],
-            'bio'           => ['nullable', 'string'],
-            'facebook'      => ['nullable', 'string', 'max:255'],
-            'twitter'       => ['nullable', 'string', 'max:255'],
-            'instagram'     => ['nullable', 'string', 'max:255'],
-            'linkedin'      => ['nullable', 'string', 'max:255'],
-            'image'         => ['nullable', 'image', 'mimes:jpg,jpeg,png,webp', 'max:2048'],
-        ]);
+        $data = $request->validated();
 
         if ($request->hasFile('image')) {
-            if ($doctor->image && Storage::disk('public')->exists($doctor->image)) {
-                Storage::disk('public')->delete($doctor->image);
-            }
-            $data['image'] = $request->file('image')->store('doctors', 'public');
-        }
-
-        // hash password only if provided (otherwise keep old)
-        if (!empty($data['password'])) {
-            $data['password'] = Hash::make($data['password']);
-        } else {
-            unset($data['password']);
+            $this->deletePublicStorageFile($doctor->image);
+            $data['image'] = $this->uploadImageToPublicStorage($request->file('image'), 'doctors');
         }
 
         $doctor->update($data);
@@ -96,12 +79,9 @@ class DoctorController extends Controller
 
     public function destroy(Doctor $doctor)
     {
-        if ($doctor->image && Storage::disk('public')->exists($doctor->image)) {
-            Storage::disk('public')->delete($doctor->image);
-        }
-
+        $this->deletePublicStorageFile($doctor->image);
         $doctor->delete();
 
-        return back()->with('success', 'Doctor deleted successfully.');
+        return redirect()->route('admin.doctors.index')->with('success', 'Doctor deleted successfully.');
     }
 }

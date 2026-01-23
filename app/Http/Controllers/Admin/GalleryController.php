@@ -3,9 +3,10 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
+use App\Http\Requests\Admin\StoreGalleryRequest;
+use App\Http\Requests\Admin\UpdateGalleryRequest;
 use App\Models\Gallery;
-use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Facades\File;
 
 class GalleryController extends Controller
 {
@@ -20,22 +21,40 @@ class GalleryController extends Controller
         return view('admin.galleries.create');
     }
 
-    public function store(Request $request)
+    private function uploadImageToPublicStorage($file, string $folder): string
     {
-        $data = $request->validate([
-            'caption' => ['nullable', 'string', 'max:255'],
-            'image'   => ['required', 'image', 'mimes:jpg,jpeg,png,webp', 'max:2048'],
-        ]);
+        $dir = public_path("storage/{$folder}");
+        File::ensureDirectoryExists($dir);
 
-        // upload image to storage/app/public/galleries
-        $path = $request->file('image')->store('galleries', 'public');
+        $filename = time() . '_' . uniqid() . '.' . $file->getClientOriginalExtension();
+        $file->move($dir, $filename);
 
-        Gallery::create([
-            'caption' => $data['caption'] ?? null,
-            'path'    => $path,
-        ]);
+        return "{$folder}/{$filename}";
+    }
 
-        return redirect()->route('admin.galleries.index')->with('success', 'Gallery image added successfully.');
+    private function deletePublicStorageFile(?string $relativePath): void
+    {
+        if (!$relativePath) return;
+
+        $fullPath = public_path('storage/' . $relativePath);
+        if (File::exists($fullPath)) {
+            File::delete($fullPath);
+        }
+    }
+
+    public function store(StoreGalleryRequest $request)
+    {
+        $data = $request->validated();
+
+        if ($request->hasFile('path')) {
+            $data['path'] = $this->uploadImageToPublicStorage($request->file('path'), 'galleries');
+        }
+
+        Gallery::create($data);
+
+        return redirect()
+            ->route('admin.galleries.index')
+            ->with('success', 'Gallery image added successfully.');
     }
 
     public function edit(Gallery $gallery)
@@ -43,36 +62,29 @@ class GalleryController extends Controller
         return view('admin.galleries.edit', compact('gallery'));
     }
 
-    public function update(Request $request, Gallery $gallery)
+    public function update(UpdateGalleryRequest $request, Gallery $gallery)
     {
-        $data = $request->validate([
-            'caption' => ['nullable', 'string', 'max:255'],
-            'image'   => ['nullable', 'image', 'mimes:jpg,jpeg,png,webp', 'max:2048'],
-        ]);
+        $data = $request->validated();
 
-        if ($request->hasFile('image')) {
-            // delete old image
-            if ($gallery->path && Storage::disk('public')->exists($gallery->path)) {
-                Storage::disk('public')->delete($gallery->path);
-            }
-
-            $gallery->path = $request->file('image')->store('galleries', 'public');
+        if ($request->hasFile('path')) {
+            $this->deletePublicStorageFile($gallery->path);
+            $data['path'] = $this->uploadImageToPublicStorage($request->file('path'), 'galleries');
         }
 
-        $gallery->caption = $data['caption'] ?? null;
-        $gallery->save();
+        $gallery->update($data);
 
-        return redirect()->route('admin.galleries.index')->with('success', 'Gallery updated successfully.');
+        return redirect()
+            ->route('admin.galleries.index')
+            ->with('success', 'Gallery image updated successfully.');
     }
 
     public function destroy(Gallery $gallery)
     {
-        if ($gallery->path && Storage::disk('public')->exists($gallery->path)) {
-            Storage::disk('public')->delete($gallery->path);
-        }
-
+        $this->deletePublicStorageFile($gallery->path);
         $gallery->delete();
 
-        return redirect()->route('admin.galleries.index')->with('success', 'Gallery deleted successfully.');
+        return redirect()
+            ->route('admin.galleries.index')
+            ->with('success', 'Gallery image deleted successfully.');
     }
 }

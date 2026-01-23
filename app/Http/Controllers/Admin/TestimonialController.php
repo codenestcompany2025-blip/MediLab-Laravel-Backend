@@ -3,9 +3,10 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
+use App\Http\Requests\Admin\StoreTestimonialRequest;
+use App\Http\Requests\Admin\UpdateTestimonialRequest;
 use App\Models\Testimonial;
-use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Facades\File;
 
 class TestimonialController extends Controller
 {
@@ -20,20 +21,38 @@ class TestimonialController extends Controller
         return view('admin.testimonials.create');
     }
 
-    public function store(Request $request)
+    private function uploadImageToPublicStorage($file, string $folder): string
     {
-        $data = $request->validate([
-            'name'      => ['required', 'string', 'max:255'],
-            'job_title' => ['required', 'string', 'max:255'],
-            'comment'   => ['required', 'string'],
-            'image'     => ['required', 'image', 'mimes:jpg,jpeg,png,webp', 'max:2048'],
-        ]);
+        $dir = public_path("storage/{$folder}");
+        File::ensureDirectoryExists($dir);
 
-        $data['image'] = $request->file('image')->store('testimonials', 'public');
+        $filename = time() . '_' . uniqid() . '.' . $file->getClientOriginalExtension();
+        $file->move($dir, $filename);
+
+        return "{$folder}/{$filename}";
+    }
+
+    private function deletePublicStorageFile(?string $relativePath): void
+    {
+        if (!$relativePath) return;
+
+        $fullPath = public_path('storage/' . $relativePath);
+        if (File::exists($fullPath)) {
+            File::delete($fullPath);
+        }
+    }
+
+    public function store(StoreTestimonialRequest $request)
+    {
+        $data = $request->validated();
+
+        if ($request->hasFile('image')) {
+            $data['image'] = $this->uploadImageToPublicStorage($request->file('image'), 'testimonials');
+        }
 
         Testimonial::create($data);
 
-        return redirect()->route('admin.testimonials.index')->with('success', 'Testimonial created.');
+        return redirect()->route('admin.testimonials.index')->with('success', 'Testimonial created successfully.');
     }
 
     public function edit(Testimonial $testimonial)
@@ -41,35 +60,25 @@ class TestimonialController extends Controller
         return view('admin.testimonials.edit', compact('testimonial'));
     }
 
-    public function update(Request $request, Testimonial $testimonial)
+    public function update(UpdateTestimonialRequest $request, Testimonial $testimonial)
     {
-        $data = $request->validate([
-            'name'      => ['required', 'string', 'max:255'],
-            'job_title' => ['required', 'string', 'max:255'],
-            'comment'   => ['required', 'string'],
-            'image'     => ['nullable', 'image', 'mimes:jpg,jpeg,png,webp', 'max:2048'],
-        ]);
+        $data = $request->validated();
 
         if ($request->hasFile('image')) {
-            if ($testimonial->image && Storage::disk('public')->exists($testimonial->image)) {
-                Storage::disk('public')->delete($testimonial->image);
-            }
-            $data['image'] = $request->file('image')->store('testimonials', 'public');
+            $this->deletePublicStorageFile($testimonial->image);
+            $data['image'] = $this->uploadImageToPublicStorage($request->file('image'), 'testimonials');
         }
 
         $testimonial->update($data);
 
-        return redirect()->route('admin.testimonials.index')->with('success', 'Testimonial updated.');
+        return redirect()->route('admin.testimonials.index')->with('success', 'Testimonial updated successfully.');
     }
 
     public function destroy(Testimonial $testimonial)
     {
-        if ($testimonial->image && Storage::disk('public')->exists($testimonial->image)) {
-            Storage::disk('public')->delete($testimonial->image);
-        }
-
+        $this->deletePublicStorageFile($testimonial->image);
         $testimonial->delete();
 
-        return redirect()->route('admin.testimonials.index')->with('success', 'Testimonial deleted.');
+        return redirect()->route('admin.testimonials.index')->with('success', 'Testimonial deleted successfully.');
     }
 }

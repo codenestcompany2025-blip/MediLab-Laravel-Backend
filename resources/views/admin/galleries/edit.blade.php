@@ -11,44 +11,36 @@
 @if ($errors->any())
     <div class="alert alert-danger">
         <ul class="mb-0">
-            @foreach ($errors->all() as $e)
-                <li>{{ $e }}</li>
+            @foreach ($errors->all() as $error)
+                <li>{{ $error }}</li>
             @endforeach
         </ul>
     </div>
 @endif
 
-<div class="card shadow mb-4">
+<div class="card shadow">
     <div class="card-body">
-
         <form action="{{ route('admin.galleries.update', $gallery) }}" method="POST" enctype="multipart/form-data">
-            @csrf
-            @method('PUT')
+        @csrf
+        @method('PUT')
 
-            <div class="form-group mb-3">
-                <label>Caption</label>
-                <input type="text" name="caption" class="form-control"
-                       value="{{ old('caption', $gallery->caption) }}">
-            </div>
+        <div class="mb-3">
+            <label>Caption</label>
+            <input type="text" name="caption" value="{{ $gallery->caption }}" class="form-control">
+        </div>
 
-            <div class="form-group mb-3">
-                <label>Current Image</label><br>
-                @if($gallery->path)
-                    <img src="{{ asset('storage/'.$gallery->path) }}"
-                         style="width:160px;height:100px;object-fit:cover;border-radius:6px;">
-                @else
-                    <span class="text-muted">No image</span>
-                @endif
-            </div>
+        <div class="mb-3">
+            <label>Current Image</label><br>
+            <img src="{{ Storage::url($gallery->path) }}" width="120">
+        </div>
 
-            <div class="form-group mb-3">
-                <label>New Image (optional)</label>
-                <input type="file" name="image" class="form-control">
-            </div>
+        <div class="mb-3">
+            <label>New Image</label>
+            <input type="file" name="path" class="form-control">
+        </div>
 
-            <button class="btn btn-primary">Update</button>
-            <a href="{{ route('admin.galleries.index') }}" class="btn btn-secondary">Cancel</a>
-        </form>
+        <button class="btn btn-primary">Update</button>
+    </form>
 
     </div>
 </div>

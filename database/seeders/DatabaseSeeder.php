@@ -1,7 +1,7 @@
 <?php
 
 namespace Database\Seeders;
-
+use App\Models\Admin;
 use App\Models\Appointment;
 use App\Models\Department;
 use App\Models\Doctor;
@@ -9,22 +9,23 @@ use App\Models\Faq;
 use App\Models\Gallery;
 use App\Models\Service;
 use App\Models\Testimonial;
-use App\Models\User;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\Hash;
+
 
 class DatabaseSeeder extends Seeder
 {
     public function run(): void
     {
-        // Admin user
-        User::query()->updateOrCreate(
+        // Admin 
+        Admin::query()->updateOrCreate(
             ['email' => 'admin@example.com'],
             [
-                'name' => 'Admin',
+                'name' => 'Super Admin',
                 'password' => Hash::make('12345678'),
             ]
         );
+
 
         // Departments
         $departments = collect([

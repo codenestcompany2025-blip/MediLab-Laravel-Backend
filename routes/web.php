@@ -11,15 +11,34 @@ use App\Http\Controllers\Admin\TestimonialController;
 use App\Http\Controllers\Admin\GalleryController;
 use App\Http\Controllers\Admin\AppointmentController;
 
+use App\Http\Controllers\Front\HomeController;
+
+/*
+|--------------------------------------------------------------------------
+| Admin Auth (separate admin guard)
+|--------------------------------------------------------------------------
+*/
 
 Route::prefix('admin')->name('admin.')->group(function () {
-    Route::get('login', [AuthController::class, 'showLoginForm'])->name('login');
-    Route::post('login', [AuthController::class, 'login'])->name('login.submit');
-    Route::post('logout', [AuthController::class, 'logout'])->name('logout');
+
+   // Login page only for those not registered as admins    
+    Route::middleware('guest:admin')->group(function () {
+        Route::get('login', [AuthController::class, 'showLoginForm'])->name('login');
+        Route::post('login', [AuthController::class, 'login'])->name('login.submit');
+    });
+
+   // Logout only for those registered as admins    
+    Route::middleware('auth:admin')->group(function () {
+        Route::post('logout', [AuthController::class, 'logout'])->name('logout');
+    });
 });
 
-
-Route::middleware('auth')->prefix('admin')->name('admin.')->group(function () {
+/*
+|--------------------------------------------------------------------------
+| Admin Panel (protected by admin guard)
+|--------------------------------------------------------------------------
+*/
+Route::middleware('auth:admin')->prefix('admin')->name('admin.')->group(function () {
 
     Route::get('/', fn () => redirect()->route('admin.dashboard'))->name('home');
 
@@ -34,4 +53,19 @@ Route::middleware('auth')->prefix('admin')->name('admin.')->group(function () {
     Route::resource('testimonials', TestimonialController::class)->except(['show']);
     Route::resource('galleries', GalleryController::class)->except(['show']);
     Route::resource('appointments', AppointmentController::class)->except(['show']);
+});
+
+/*
+|--------------------------------------------------------------------------
+| Frontend
+|--------------------------------------------------------------------------
+*/
+Route::name('front.')->group(function () {
+    Route::get('/', [HomeController::class, 'index'])->name('home');
+    Route::get('/about', [HomeController::class, 'about'])->name('about');
+    Route::get('/services', [HomeController::class, 'services'])->name('services');
+    Route::get('/doctors', [HomeController::class, 'doctors'])->name('doctors');
+    Route::get('/gallery', [HomeController::class, 'gallery'])->name('gallery');
+    Route::get('/faq', [HomeController::class, 'faq'])->name('faq');
+    Route::get('/contact', [HomeController::class, 'contact'])->name('contact');
 });

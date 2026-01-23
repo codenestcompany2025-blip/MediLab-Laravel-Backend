@@ -17,15 +17,15 @@
 <div class="card shadow mb-4">
     <div class="card-body">
         <div class="table-responsive">
-            <table class="table table-bordered align-middle">
+            <table class="table table-bordered">
                 <thead>
-                    <tr>
-                        <th style="width:70px;">#</th>
-                        <th style="width:140px;">Image</th>
-                        <th>Name</th>
-                        <th>Description</th>
-                        <th style="width:180px;">Actions</th>
-                    </tr>
+                <tr>
+                    <th style="width:70px">#</th>
+                    <th style="width:160px">Image</th>
+                    <th>Name</th>
+                    <th>Description</th>
+                    <th style="width:180px">Actions</th>
+                </tr>
                 </thead>
 
                 <tbody>
@@ -37,11 +37,10 @@
 
                         <td>
                             @if($department->image)
-                                <img
-                                    src="{{ asset('storage/'.$department->image) }}"
-                                    alt="department"
-                                    style="width:90px;height:60px;object-fit:cover;border-radius:6px;"
-                                >
+                                <img 
+                                src="{{ asset('storage/'.$department->image) }}"
+                                     alt="department"
+                                     style="width:140px;height:90px;object-fit:cover;border-radius:6px;">
                             @else
                                 <span class="text-muted">No image</span>
                             @endif
@@ -49,21 +48,16 @@
 
                         <td>{{ $department->name }}</td>
 
-                        <td>
-                            {{ \Illuminate\Support\Str::limit($department->description, 80) }}
-                        </td>
+                        <td>{{ \Illuminate\Support\Str::limit($department->description, 80) }}</td>
 
                         <td>
-                            <a href="{{ route('admin.departments.edit', $department) }}" class="btn btn-warning btn-sm">
-                                Edit
-                            </a>
+                            <a href="{{ route('admin.departments.edit', $department) }}" class="btn btn-warning btn-sm">Edit</a>
 
-                            <form action="{{ route('admin.departments.destroy', $department) }}" method="POST" class="d-inline">
+                            <form action="{{ route('admin.departments.destroy', $department) }}"
+                                  method="POST" class="d-inline">
                                 @csrf
                                 @method('DELETE')
-                                <button onclick="return confirm('Delete this department?')" class="btn btn-danger btn-sm">
-                                    Delete
-                                </button>
+                                <button onclick="return confirm('Delete?')" class="btn btn-danger btn-sm">Delete</button>
                             </form>
                         </td>
                     </tr>

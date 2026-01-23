@@ -20,12 +20,12 @@
             <table class="table table-bordered align-middle">
                 <thead>
                     <tr>
-                        <th style="width:70px">#</th>
-                        <th style="width:140px">Image</th>
+                        <th style="width:70px;">#</th>
+                        <th style="width:120px;">Image</th>
                         <th>Name</th>
-                        <th>Job Title</th>
-                        <th>Comment</th>
-                        <th style="width:180px">Actions</th>
+                        <th>Position</th>
+                        <th style="width:260px;">Message</th>
+                        <th style="width:180px;">Actions</th>
                     </tr>
                 </thead>
 
@@ -37,23 +37,26 @@
                         </td>
 
                         <td>
-                            @php
-                                $img = $t->image
-                                    ? asset('storage/'.$t->image)
-                                    : asset('admin/img/undraw_posting_photo.svg');
-                            @endphp
-
-                            <img
-                                src="{{ $img }}"
-                                alt="testimonial"
-                                style="width:80px;height:80px;object-fit:cover;border-radius:50%;"
-                                onerror="this.src='{{ asset('admin/img/undraw_posting_photo.svg') }}';"
-                            >
+                            @if(!empty($t->image))
+                                <img
+                                    src="{{ asset('storage/'.$t->image) }}"
+                                    alt="testimonial"
+                                    style="width:70px;height:70px;object-fit:cover;border-radius:50%;"
+                                >
+                            @else
+                                <img
+                                    src="{{ asset('admin/img/undraw_posting_photo.svg') }}"
+                                    alt="no image"
+                                    style="width:70px;height:70px;object-fit:cover;border-radius:50%;"
+                                >
+                            @endif
                         </td>
 
                         <td>{{ $t->name }}</td>
                         <td>{{ $t->job_title }}</td>
-                        <td>{{ \Illuminate\Support\Str::limit($t->comment, 80) }}</td>
+                        <td style="max-width:260px;">
+                            {{ \Illuminate\Support\Str::limit($t->comment, 80) }}
+                        </td>
 
                         <td>
                             <a href="{{ route('admin.testimonials.edit', $t) }}" class="btn btn-warning btn-sm">
@@ -63,7 +66,7 @@
                             <form action="{{ route('admin.testimonials.destroy', $t) }}" method="POST" class="d-inline">
                                 @csrf
                                 @method('DELETE')
-                                <button type="submit" onclick="return confirm('Delete this testimonial?')" class="btn btn-danger btn-sm">
+                                <button onclick="return confirm('Delete this testimonial?')" class="btn btn-danger btn-sm">
                                     Delete
                                 </button>
                             </form>
