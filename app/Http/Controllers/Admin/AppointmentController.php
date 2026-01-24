@@ -3,62 +3,106 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
-use App\Http\Requests\Admin\StoreAppointmentRequest;
-use App\Http\Requests\Admin\UpdateAppointmentRequest;
 use App\Models\Appointment;
 use App\Models\Department;
 use App\Models\Doctor;
+use Illuminate\Http\Request;
 
 class AppointmentController extends Controller
 {
+    /**
+     * Display a listing of the appointments.
+     */
     public function index()
-    {
-        $appointments = Appointment::with(['department', 'doctor'])
-            ->latest()
-            ->paginate(10);
+{
+    $appointments = \App\Models\Appointment::with(['department', 'doctor'])
+        ->orderBy('id', 'asc') 
+        ->paginate(10);
 
-        return view('admin.appointments.index', compact('appointments'));
-    }
+    return view('admin.appointments.index', compact('appointments'));
+}
 
+    /**
+     * Show the form for creating a new appointment.
+     */
     public function create()
     {
-        $departments = Department::orderBy('name')->get();
-        $doctors = Doctor::orderBy('name')->get();
+        $departments = Department::all();
+        $doctors = Doctor::all();
 
         return view('admin.appointments.create', compact('departments', 'doctors'));
     }
 
-    public function store(StoreAppointmentRequest $request)
+    /**
+     * Store a newly created appointment in storage.
+     */
+    public function store(Request $request)
     {
-        $data = $request->validated();
-        Appointment::create($data);
+        $validated = $request->validate([
+            'name' => ['required', 'string', 'max:255'],
+            'email' => ['required', 'email', 'max:255'],
+            'phone' => ['required', 'string', 'max:50'],
+            'appointment_at' => ['required', 'date'],
+            'department_id' => ['required', 'exists:departments,id'],
+            'doctor_id' => ['required', 'exists:doctors,id'],
+            'status' => ['required', 'in:pending,confirmed,cancelled'],
+            'message' => ['nullable', 'string'],
+        ]);
 
-        return redirect()->route('admin.appointments.index')
+        Appointment::create($validated);
+
+        return redirect()
+            ->route('admin.appointments.index')
             ->with('success', 'Appointment created successfully.');
     }
 
+    /**
+     * Show the form for editing the specified appointment.
+     */
     public function edit(Appointment $appointment)
     {
-        $departments = Department::orderBy('name')->get();
-        $doctors = Doctor::orderBy('name')->get();
+        $departments = Department::all();
+        $doctors = Doctor::all();
 
-        return view('admin.appointments.edit', compact('appointment', 'departments', 'doctors'));
+        return view('admin.appointments.edit', compact(
+            'appointment',
+            'departments',
+            'doctors'
+        ));
     }
 
-    public function update(UpdateAppointmentRequest $request, Appointment $appointment)
+    /**
+     * Update the specified appointment in storage.
+     */
+    public function update(Request $request, Appointment $appointment)
     {
-        $data = $request->validated();
-        $appointment->update($data);
+        $validated = $request->validate([
+            'name' => ['required', 'string', 'max:255'],
+            'email' => ['required', 'email', 'max:255'],
+            'phone' => ['required', 'string', 'max:50'],
+            'appointment_at' => ['required', 'date'],
+            'department_id' => ['required', 'exists:departments,id'],
+            'doctor_id' => ['required', 'exists:doctors,id'],
+            'status' => ['required', 'in:pending,confirmed,cancelled'],
+            'message' => ['nullable', 'string'],
+        ]);
 
-        return redirect()->route('admin.appointments.index')
+        $appointment->update($validated);
+
+        return redirect()
+            ->route('admin.appointments.index')
             ->with('success', 'Appointment updated successfully.');
     }
 
+    /**
+     * Remove the specified appointment from storage.
+     */
     public function destroy(Appointment $appointment)
     {
         $appointment->delete();
 
-        return redirect()->route('admin.appointments.index')
+        return redirect()
+            ->route('admin.appointments.index')
             ->with('success', 'Appointment deleted successfully.');
     }
 }

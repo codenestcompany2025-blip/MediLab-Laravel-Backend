@@ -33,28 +33,24 @@
             <div class="form-row">
                 <div class="form-group col-md-6">
                     <label>Patient Name</label>
-                    <input type="text" name="name" class="form-control"
-                           value="{{ old('name') }}" required>
+                    <input type="text" name="name" class="form-control" value="{{ old('name') }}" required>
                 </div>
 
                 <div class="form-group col-md-6">
                     <label>Email</label>
-                    <input type="email" name="email" class="form-control"
-                           value="{{ old('email') }}" required>
+                    <input type="email" name="email" class="form-control" value="{{ old('email') }}" required>
                 </div>
             </div>
 
             <div class="form-row">
                 <div class="form-group col-md-6">
                     <label>Phone</label>
-                    <input type="text" name="phone" class="form-control"
-                           value="{{ old('phone') }}" required>
+                    <input type="text" name="phone" class="form-control" value="{{ old('phone') }}" required>
                 </div>
 
                 <div class="form-group col-md-6">
                     <label>Appointment Date & Time</label>
-                    <input type="datetime-local" name="appointment_at" class="form-control"
-                           value="{{ old('appointment_at') }}" required>
+                    <input type="datetime-local" name="appointment_at" class="form-control" value="{{ old('appointment_at') }}" required>
                 </div>
             </div>
 
@@ -62,10 +58,10 @@
                 <div class="form-group col-md-6">
                     <label>Department</label>
                     <select name="department_id" class="form-control" required>
-                        <option value="">-- Select Department --</option>
-                        @foreach($departments as $dep)
-                            <option value="{{ $dep->id }}" {{ old('department_id') == $dep->id ? 'selected' : '' }}>
-                                {{ $dep->name }}
+                        <option value="">Select Department</option>
+                        @foreach($departments as $department)
+                            <option value="{{ $department->id }}" {{ old('department_id') == $department->id ? 'selected' : '' }}>
+                                {{ $department->name }}
                             </option>
                         @endforeach
                     </select>
@@ -74,10 +70,10 @@
                 <div class="form-group col-md-6">
                     <label>Doctor</label>
                     <select name="doctor_id" class="form-control" required>
-                        <option value="">-- Select Doctor --</option>
-                        @foreach($doctors as $doc)
-                            <option value="{{ $doc->id }}" {{ old('doctor_id') == $doc->id ? 'selected' : '' }}>
-                                {{ $doc->name }}
+                        <option value="">Select Doctor</option>
+                        @foreach($doctors as $doctor)
+                            <option value="{{ $doctor->id }}" {{ old('doctor_id') == $doctor->id ? 'selected' : '' }}>
+                                {{ $doctor->name }}
                             </option>
                         @endforeach
                     </select>
@@ -101,7 +97,6 @@
             </div>
 
             <button class="btn btn-primary">Create</button>
-            <a href="{{ route('admin.appointments.index') }}" class="btn btn-light">Cancel</a>
         </form>
     </div>
 </div>

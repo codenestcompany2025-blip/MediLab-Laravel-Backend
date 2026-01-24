@@ -40,28 +40,24 @@
             <div class="form-row">
                 <div class="form-group col-md-6">
                     <label>Patient Name</label>
-                    <input type="text" name="name" class="form-control"
-                           value="{{ old('name', $appointment->name) }}" required>
+                    <input type="text" name="name" class="form-control" value="{{ old('name', $appointment->name) }}" required>
                 </div>
 
                 <div class="form-group col-md-6">
                     <label>Email</label>
-                    <input type="email" name="email" class="form-control"
-                           value="{{ old('email', $appointment->email) }}" required>
+                    <input type="email" name="email" class="form-control" value="{{ old('email', $appointment->email) }}" required>
                 </div>
             </div>
 
             <div class="form-row">
                 <div class="form-group col-md-6">
                     <label>Phone</label>
-                    <input type="text" name="phone" class="form-control"
-                           value="{{ old('phone', $appointment->phone) }}" required>
+                    <input type="text" name="phone" class="form-control" value="{{ old('phone', $appointment->phone) }}" required>
                 </div>
 
                 <div class="form-group col-md-6">
                     <label>Appointment Date & Time</label>
-                    <input type="datetime-local" name="appointment_at" class="form-control"
-                           value="{{ old('appointment_at', $dtValue) }}" required>
+                    <input type="datetime-local" name="appointment_at" class="form-control" value="{{ old('appointment_at', $dtValue) }}" required>
                 </div>
             </div>
 
@@ -69,11 +65,9 @@
                 <div class="form-group col-md-6">
                     <label>Department</label>
                     <select name="department_id" class="form-control" required>
-                        <option value="">-- Select Department --</option>
-                        @foreach($departments as $dep)
-                            <option value="{{ $dep->id }}"
-                                {{ (int)old('department_id', $appointment->department_id) === (int)$dep->id ? 'selected' : '' }}>
-                                {{ $dep->name }}
+                        @foreach($departments as $department)
+                            <option value="{{ $department->id }}" {{ old('department_id', $appointment->department_id) == $department->id ? 'selected' : '' }}>
+                                {{ $department->name }}
                             </option>
                         @endforeach
                     </select>
@@ -82,11 +76,9 @@
                 <div class="form-group col-md-6">
                     <label>Doctor</label>
                     <select name="doctor_id" class="form-control" required>
-                        <option value="">-- Select Doctor --</option>
-                        @foreach($doctors as $doc)
-                            <option value="{{ $doc->id }}"
-                                {{ (int)old('doctor_id', $appointment->doctor_id) === (int)$doc->id ? 'selected' : '' }}>
-                                {{ $doc->name }}
+                        @foreach($doctors as $doctor)
+                            <option value="{{ $doctor->id }}" {{ old('doctor_id', $appointment->doctor_id) == $doctor->id ? 'selected' : '' }}>
+                                {{ $doctor->name }}
                             </option>
                         @endforeach
                     </select>
@@ -110,7 +102,6 @@
             </div>
 
             <button class="btn btn-primary">Update</button>
-            <a href="{{ route('admin.appointments.index') }}" class="btn btn-light">Cancel</a>
         </form>
     </div>
 </div>

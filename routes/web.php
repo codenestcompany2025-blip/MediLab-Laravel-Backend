@@ -11,23 +11,20 @@ use App\Http\Controllers\Admin\TestimonialController;
 use App\Http\Controllers\Admin\GalleryController;
 use App\Http\Controllers\Admin\AppointmentController;
 
-use App\Http\Controllers\Front\HomeController;
+use App\Models\Appointment;
 
 /*
 |--------------------------------------------------------------------------
-| Admin Auth (separate admin guard)
+| Admin Authentication
 |--------------------------------------------------------------------------
 */
-
 Route::prefix('admin')->name('admin.')->group(function () {
 
-   // Login page only for those not registered as admins    
     Route::middleware('guest:admin')->group(function () {
         Route::get('login', [AuthController::class, 'showLoginForm'])->name('login');
         Route::post('login', [AuthController::class, 'login'])->name('login.submit');
     });
 
-   // Logout only for those registered as admins    
     Route::middleware('auth:admin')->group(function () {
         Route::post('logout', [AuthController::class, 'logout'])->name('logout');
     });
@@ -35,15 +32,39 @@ Route::prefix('admin')->name('admin.')->group(function () {
 
 /*
 |--------------------------------------------------------------------------
-| Admin Panel (protected by admin guard)
+| Admin Dashboard & Panel
 |--------------------------------------------------------------------------
 */
 Route::middleware('auth:admin')->prefix('admin')->name('admin.')->group(function () {
 
     Route::get('/', fn () => redirect()->route('admin.dashboard'))->name('home');
 
+    /**
+     * Dashboard
+     * - Statistics
+     * - Charts
+     * - Latest 4 appointments as summary ONLY
+     */
     Route::get('/dashboard', function () {
-        return view('admin.dashboard');
+
+        $appointmentsCount = Appointment::count();
+
+        $pendingAppointmentsCount   = Appointment::where('status', 'pending')->count();
+        $confirmedAppointmentsCount = Appointment::where('status', 'confirmed')->count();
+        $cancelledAppointmentsCount = Appointment::where('status', 'cancelled')->count();
+
+        // ✅ Engineer request: ONLY last 4 reservations as summary
+        $latestAppointments = Appointment::latest()
+            ->take(4)
+            ->get();
+
+        return view('admin.dashboard', compact(
+            'appointmentsCount',
+            'pendingAppointmentsCount',
+            'confirmedAppointmentsCount',
+            'cancelledAppointmentsCount',
+            'latestAppointments'
+        ));
     })->name('dashboard');
 
     Route::resource('departments', DepartmentController::class)->except(['show']);
@@ -69,5 +90,4 @@ Route::name('front.')->group(function () {
 
     Route::post('/contact', [\App\Http\Controllers\Front\ContactController::class, 'store'])
         ->name('contact.store');
-
 });
