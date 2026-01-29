@@ -2,70 +2,51 @@
 
 use Illuminate\Support\Facades\Route;
 
-use App\Http\Controllers\Admin\AuthController;
+use App\Http\Controllers\Admin\AuthController as AdminAuthController;
 use App\Http\Controllers\Admin\DepartmentController;
 use App\Http\Controllers\Admin\ServiceController;
 use App\Http\Controllers\Admin\DoctorController;
 use App\Http\Controllers\Admin\FaqController;
 use App\Http\Controllers\Admin\TestimonialController;
 use App\Http\Controllers\Admin\GalleryController;
-use App\Http\Controllers\Admin\AppointmentController;
+use App\Http\Controllers\Admin\AppointmentController as AdminAppointmentController;
+use App\Http\Controllers\Admin\DashboardController as AdminDashboardController;
 
-use App\Models\Appointment;
+use App\Http\Controllers\Front\HomeController;
+
+// Doctor Controllers
+use App\Http\Controllers\Doctor\AuthController as DoctorAuthController;
+use App\Http\Controllers\Doctor\DashboardController as DoctorDashboardController;
+use App\Http\Controllers\Doctor\AppointmentController as DoctorAppointmentController;
 
 /*
 |--------------------------------------------------------------------------
-| Admin Authentication
+| Admin Auth (separate admin guard)
 |--------------------------------------------------------------------------
 */
+
 Route::prefix('admin')->name('admin.')->group(function () {
 
     Route::middleware('guest:admin')->group(function () {
-        Route::get('login', [AuthController::class, 'showLoginForm'])->name('login');
-        Route::post('login', [AuthController::class, 'login'])->name('login.submit');
+        Route::get('login', [AdminAuthController::class, 'showLoginForm'])->name('login');
+        Route::post('login', [AdminAuthController::class, 'login'])->name('login.submit');
     });
 
     Route::middleware('auth:admin')->group(function () {
-        Route::post('logout', [AuthController::class, 'logout'])->name('logout');
+        Route::post('logout', [AdminAuthController::class, 'logout'])->name('logout');
     });
 });
 
 /*
 |--------------------------------------------------------------------------
-| Admin Dashboard & Panel
+| Admin Panel (protected by admin guard)
 |--------------------------------------------------------------------------
 */
 Route::middleware('auth:admin')->prefix('admin')->name('admin.')->group(function () {
 
     Route::get('/', fn () => redirect()->route('admin.dashboard'))->name('home');
 
-    /**
-     * Dashboard
-     * - Statistics
-     * - Charts
-     * - Latest 4 appointments as summary ONLY
-     */
-    Route::get('/dashboard', function () {
-
-        $appointmentsCount = Appointment::count();
-
-        $pendingAppointmentsCount   = Appointment::where('status', 'pending')->count();
-        $confirmedAppointmentsCount = Appointment::where('status', 'confirmed')->count();
-        $cancelledAppointmentsCount = Appointment::where('status', 'cancelled')->count();
-
-        // ✅ Engineer request: ONLY last 4 reservations as summary
-        $latestAppointments = Appointment::latest()
-            ->take(4)
-            ->get();
-
-        return view('admin.dashboard', compact(
-            'appointmentsCount',
-            'pendingAppointmentsCount',
-            'confirmedAppointmentsCount',
-            'cancelledAppointmentsCount',
-            'latestAppointments'
-        ));
-    })->name('dashboard');
+    Route::get('/dashboard', [AdminDashboardController::class, 'index'])->name('dashboard');
 
     Route::resource('departments', DepartmentController::class)->except(['show']);
     Route::resource('services', ServiceController::class)->except(['show']);
@@ -73,7 +54,36 @@ Route::middleware('auth:admin')->prefix('admin')->name('admin.')->group(function
     Route::resource('faqs', FaqController::class)->except(['show']);
     Route::resource('testimonials', TestimonialController::class)->except(['show']);
     Route::resource('galleries', GalleryController::class)->except(['show']);
-    Route::resource('appointments', AppointmentController::class)->except(['show']);
+    Route::resource('appointments', AdminAppointmentController::class)->except(['show']);
+});
+
+/*
+|--------------------------------------------------------------------------
+|  Doctor Auth + Doctor Panel
+|--------------------------------------------------------------------------
+*/
+Route::prefix('doctor')->name('doctor.')->group(function () {
+
+    // Login (guest doctor only)
+    Route::middleware('guest:doctor')->group(function () {
+        Route::get('login', [DoctorAuthController::class, 'showLoginForm'])->name('login');
+        Route::post('login', [DoctorAuthController::class, 'login'])->name('login.submit');
+    });
+
+    // Doctor panel (auth doctor only)
+    Route::middleware('auth:doctor')->group(function () {
+
+        Route::post('logout', [DoctorAuthController::class, 'logout'])->name('logout');
+
+        Route::get('/', fn () => redirect()->route('doctor.dashboard'))->name('home');
+
+        Route::get('/dashboard', [DoctorDashboardController::class, 'index'])->name('dashboard');
+
+        // Doctor appointments (ONLY his own appointments)
+        Route::get('/appointments', [DoctorAppointmentController::class, 'index'])->name('appointments.index');
+        Route::get('/appointments/{appointment}/edit', [DoctorAppointmentController::class, 'edit'])->name('appointments.edit');
+        Route::put('/appointments/{appointment}', [DoctorAppointmentController::class, 'update'])->name('appointments.update');
+    });
 });
 
 /*

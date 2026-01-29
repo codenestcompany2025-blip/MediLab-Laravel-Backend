@@ -1,12 +1,11 @@
-@extends('admin.layouts.app')
+@extends('doctor.layouts.app')
 
-@section('title', 'Dashboard')
-@section('page_title', 'Dashboard')
+@section('title', 'Doctor Dashboard')
 
 @section('content')
 <div class="container-fluid">
 
-    <!-- ================= Summary Cards ================= -->
+    {{-- ===== Summary Cards ===== --}}
     <div class="row mb-4">
 
         <div class="col-xl-3 col-md-6 mb-3">
@@ -63,10 +62,10 @@
 
     </div>
 
-    <!-- ================= Charts ================= -->
+    {{-- ===== Charts ===== --}}
     <div class="row mb-4">
 
-        <!-- Pie Chart -->
+        {{-- Pie Chart --}}
         <div class="col-lg-6 mb-3">
             <div class="card shadow h-100">
                 <div class="card-header py-2">
@@ -80,7 +79,7 @@
             </div>
         </div>
 
-        <!-- Bar Chart -->
+        {{-- Bar Chart --}}
         <div class="col-lg-6 mb-3">
             <div class="card shadow h-100">
                 <div class="card-header py-2">
@@ -96,13 +95,14 @@
 
     </div>
 
-    <!-- ================= Latest 4 Reservations Summary ================= -->
+    {{-- ===== Latest 4 Appointments Summary ===== --}}
     <div class="card shadow mb-4">
         <div class="card-header d-flex align-items-center justify-content-between">
             <h6 class="m-0 font-weight-bold text-primary">
-                Latest 4 Reservations (Summary)
+                Latest 4 Appointments (Summary)
             </h6>
-            <a href="{{ route('admin.appointments.index') }}" class="btn btn-sm btn-outline-primary">
+
+            <a href="{{ route('doctor.appointments.index') }}" class="btn btn-sm btn-outline-primary">
                 View Full List
             </a>
         </div>
@@ -117,13 +117,16 @@
                                 <th>Phone</th>
                                 <th>Date & Time</th>
                                 <th>Status</th>
+                                <th style="width: 120px;">Action</th>
                             </tr>
                         </thead>
+
                         <tbody>
                             @foreach($latestAppointments as $appointment)
                                 <tr>
                                     <td>{{ $appointment->name }}</td>
                                     <td>{{ $appointment->phone }}</td>
+
                                     <td>
                                         @php
                                             $dt = $appointment->appointment_at;
@@ -137,6 +140,7 @@
                                             -
                                         @endif
                                     </td>
+
                                     <td>
                                         <span class="badge badge-{{
                                             $appointment->status === 'pending' ? 'warning' :
@@ -145,24 +149,32 @@
                                             {{ ucfirst($appointment->status) }}
                                         </span>
                                     </td>
+
+                                    <td>
+                                        <a href="{{ route('doctor.appointments.edit', $appointment) }}"
+                                           class="btn btn-sm btn-primary">
+                                            Update
+                                        </a>
+                                    </td>
                                 </tr>
                             @endforeach
                         </tbody>
+
                     </table>
                 </div>
 
                 <small class="text-muted d-block mt-2">
-                    Dashboard shows only the latest 4 reservations as a summary.
+                    Dashboard shows only the latest 4 appointments as a summary.
                 </small>
             @else
-                <p class="text-muted mb-0">No reservations found.</p>
+                <p class="text-muted mb-0">No appointments found.</p>
             @endif
         </div>
     </div>
 
 </div>
 
-<!-- Chart.js -->
+{{-- Chart.js --}}
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
 <script>
@@ -213,10 +225,7 @@
             scales: {
                 y: {
                     beginAtZero: true,
-                    ticks: {
-                        precision: 0,
-                        stepSize: 1
-                    }
+                    ticks: { precision: 0, stepSize: 1 }
                 }
             },
             plugins: {
